@@ -1,7 +1,6 @@
 import express from 'express';
-// import auctionRouter from './routers/auctionRouter';
-// import bidRouter from './routers/bidRouter';
-// import memberRouter from './routers/memberRouter';
+import { auctionRouter, bidRouter, memberRouter } from './routers';
+
 const app = express(),
   port = 4000;
 
@@ -11,6 +10,6 @@ app
 
 // DB 연결
 
-// app.use('/api/auction', auctionRouter);
-// app.use('/api/bid', bidRouter);
-// app.use('/api/member', memberRouter);
+app.use('/api/auction', auctionRouter);
+app.use('/api/bid', bidRouter);
+app.use('/api/member', memberRouter);
