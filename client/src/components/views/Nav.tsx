@@ -5,8 +5,11 @@ const Nav = () => {
     <>
       <div className="m-4">
         <div className="m-1 d-flex flex-row-reverse">
-          <button className="p-2 btn btn-primary">
+          <button className="m-1 p-2 btn btn-outline-primary">
             <span className="m-4">로그인</span>
+          </button>
+          <button className="m-1 p-2 btn btn-outline-success">
+            <span className="m-4">회원가입</span>
           </button>
         </div>
       </div>
