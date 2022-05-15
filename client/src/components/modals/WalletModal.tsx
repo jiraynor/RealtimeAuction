@@ -22,7 +22,7 @@ const WalletModal = (props: any) => {
       .post(`/api/member/deposit`, body)
       .then((response: AxiosResponse<any, any>) => {
         if (response.status === 200) {
-          props.setBalance(response.data);
+          props.setBalance(response.data.balance);
         } else {
           setTransactionMessage('입금에 실패했습니다.');
           return;
@@ -31,14 +31,15 @@ const WalletModal = (props: any) => {
   };
 
   const withdrawalHandler = () => {
-    const body = {
+    const body = { 
+      id,
       amount,
     };
     axios
       .post(`/api/member/withdrawal`, body)
       .then((response: AxiosResponse<any, any>) => {
         if (response.status === 200) {
-          props.setBalance(response.data);
+          props.setBalance(response.data.balance);
         } else {
           setTransactionMessage('출금에 실패했습니다.');
           return;
@@ -60,6 +61,7 @@ const WalletModal = (props: any) => {
                 type="number"
                 className="form-control"
                 placeholder="금액"
+                onChange={onAmountHandler}
               />
               <div className="input-group-append">
                 <span className="input-group-text">원</span>

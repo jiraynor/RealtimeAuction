@@ -101,11 +101,51 @@ const memberRouter = (datasource: DataSource) => {
   router.patch('/update', async (req, res, next) => {
     console.log('memberUpdate');
   });
+
+  // deposit: 입금하기
   router.post('/deposit', async (req, res, next) => {
-    console.log('deposit');
+    const { id, amount } = req.body;
+
+    console.log(amount);
+    const member: Member = await memberRepository.findOneBy({ id });
+
+    if (member) {
+      // 입금 성공
+      member.balance += amount;
+
+      memberRepository.save(member);
+
+      console.log(member.balance);
+
+      res.status(200);
+      res.json({ balance: member.balance });
+    } else {
+      // 입금 실패
+      res.status(422);
+    }
   });
+
+  // wirhdrawal: 출금하기
   router.post('/withdrawal', async (req, res, next) => {
-    console.log('withdrawal');
+    const { id, amount } = req.body;
+
+    console.log(amount);
+    const member: Member = await memberRepository.findOneBy({ id });
+
+    if (member && member.balance >= amount) {
+      // 출금 성공
+      member.balance -= amount;
+
+      memberRepository.save(member);
+
+      console.log(member.balance);
+
+      res.status(200);
+      res.json({ balance: member.balance });
+    } else {
+      // 출금 실패
+      res.status(422);
+    }
   });
 
   return router;
