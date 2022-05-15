@@ -1,6 +1,13 @@
-import { BaseEntity, Column, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Member } from './Member.entity';
 
+@Entity()
 export class Bid_log extends BaseEntity {
   @PrimaryGeneratedColumn()
   log_num: number;
