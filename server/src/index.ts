@@ -11,7 +11,7 @@ const app: Express = express(),
 
 app.use('/api/auction', auctionRouter(datasource));
 app.use('/api/bid', bidRouter(datasource));
-app.use('/api/member', memberRouter);
+app.use('/api/member', memberRouter(datasource));
 
 app
   .get('/', (req, res) => res.json({ message: 'Hello' }))
