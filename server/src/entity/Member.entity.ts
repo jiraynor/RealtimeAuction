@@ -5,7 +5,7 @@ export class Member extends BaseEntity {
   @PrimaryColumn()
   id: string;
 
-  @Column()
+  @Column({ type: 'varchar', length: 20, nullable: false })
   password: string;
 
   @Column()
