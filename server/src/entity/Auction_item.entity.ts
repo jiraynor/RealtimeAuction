@@ -42,26 +42,32 @@ export class Auction_item extends BaseEntity {
   @Column({ type: 'datetime', nullable: false, default: () => 'now()' })
   reg_datetime: string;
 
+  // 마감일
   @Column({ type: 'datetime', nullable: false })
   deadline: string;
 
+  // 판매자 아이디
   @ManyToOne(() => Member, (member) => member.id, {
     eager: true,
     nullable: false,
   })
   saler_id: string;
 
+  // 낙찰 여부
   @Column({ nullable: false, default: false })
   successful_bid_status: boolean;
 
+  // 낙찰자 아이디
   @ManyToOne(() => Member, (member) => member.id, {
     eager: true,
   })
   successful_bidder_id: String;
 
+  // 낙찰 가격
   @Column({ type: 'int', default: null })
   successful_bid_price: number;
 
+  // 낙찰일
   @Column({ type: 'datetime', default: null })
   successful_bid_datetime: string;
 }
