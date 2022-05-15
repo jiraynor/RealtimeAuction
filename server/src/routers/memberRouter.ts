@@ -87,7 +87,12 @@ const memberRouter = (datasource: DataSource) => {
       res.end('실패');
     }
   });
+  // signOut: 로그아웃
   router.get('/signOut', async (req, res, next) => {
+    res.clearCookie('authToken');
+    res.clearCookie('member');
+    res.end('성공');
+
     console.log('signOut');
   });
   router.get('/get', async (req, res, next) => {
