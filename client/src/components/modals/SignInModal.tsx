@@ -39,7 +39,7 @@ const SignInModal = (props: any) => {
     };
 
     axios
-      .post(`/api/member/signIp`, body)
+      .post(`/api/member/signIn`, body)
       .then((response: AxiosResponse<any, any>) => {
         if (response.status === 200) {
           props.setStatus(true);
