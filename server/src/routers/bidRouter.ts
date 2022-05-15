@@ -1,17 +1,22 @@
-import { Router } from 'express';
+import { IRouter, Router } from 'express';
+import { DataSource } from 'typeorm';
 
-const bidRouter: Router = Router();
+const bidRouter = (datasource: DataSource) => {
+  const router: Router = Router();
 
-bidRouter.post('/set', (req, res, next) => {
-  console.log('set');
-});
+  router.post('/set', (req, res, next) => {
+    console.log('set');
+  });
 
-bidRouter.post('/immediate', (req, res, next) => {
-  console.log('immediate');
-});
+  router.post('/immediate', (req, res, next) => {
+    console.log('immediate');
+  });
 
-bidRouter.get('/getBids', (req, res, next) => {
-  console.log('getBids');
-});
+  router.get('/getBids', (req, res, next) => {
+    console.log('getBids');
+  });
+
+  return router;
+};
 
 export default bidRouter;
