@@ -1,6 +1,13 @@
-import { BaseEntity, Column, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Auction_item } from './Auction_item.entity';
 
+@Entity()
 export class Item_img extends BaseEntity {
   // 이미지 번호
   @PrimaryGeneratedColumn()

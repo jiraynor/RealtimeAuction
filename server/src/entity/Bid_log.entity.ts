@@ -1,7 +1,14 @@
-import { BaseEntity, Column, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Auction_item } from './Auction_item';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Auction_item } from './Auction_item.entity';
 import { Member } from './Member.entity';
 
+@Entity()
 export class Bid_log extends BaseEntity {
   @PrimaryGeneratedColumn()
   log_num: number;
