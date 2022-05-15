@@ -1,24 +1,17 @@
 import express from 'express';
 import { auctionRouter, bidRouter, memberRouter } from './routers';
-import sequelize from './models';
+import AppDataSource from './app-data-source';
 
 const app = express(),
   port = 4000;
 
-app
-  .get('/', (req, res) => res.json({ message: 'Hello' }))
-  .listen(port, () => console.log(`port: ${port} start`));
-
 // DB 연결
-sequelize
-  .sync({ force: false })
-  .then(() => {
-    console.log('데이터베이스 연결 성공');
-  })
-  .catch((err) => {
-    console.error(err);
-  });
+AppDataSource;
 
 app.use('/api/auction', auctionRouter);
 app.use('/api/bid', bidRouter);
 app.use('/api/member', memberRouter);
+
+app
+  .get('/', (req, res) => res.json({ message: 'Hello' }))
+  .listen(port, () => console.log(`port: ${port} start`));
