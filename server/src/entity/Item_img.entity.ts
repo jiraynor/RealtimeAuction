@@ -1,5 +1,5 @@
 import { BaseEntity, Column, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Auction_item } from './auction_item';
+import { Auction_item } from './Auction_item.entity';
 
 export class Item_img extends BaseEntity {
   // 이미지 번호
