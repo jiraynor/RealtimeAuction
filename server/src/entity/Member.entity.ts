@@ -8,24 +8,24 @@ export class Member extends BaseEntity {
   @Column({ type: 'varchar', length: 20, nullable: false })
   password: string;
 
-  @Column()
+  @Column({ type: 'varchar', length: 20, nullable: false })
   name: string;
 
-  @Column()
+  @Column({ type: 'text', nullable: false })
   address: string;
 
-  @Column()
+  @Column({ type: 'varchar', length: 15, nullable: false })
   tel: string;
 
-  @Column()
+  @Column({ type: 'varchar', length: 100, nullable: false })
   email: string;
 
-  @Column()
+  @Column({ type: 'int', nullable: false, default: 0 })
   balance: number;
 
-  @Column()
+  @Column({ type: 'varchar', length: 15, nullable: false })
   account_num: string;
 
-  @Column()
+  @Column({ type: 'varchar', length: 3, nullable: false })
   bank_code: string;
 }

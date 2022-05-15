@@ -1,15 +1,16 @@
-import express from 'express';
+import express, { Express } from 'express';
 import { auctionRouter, bidRouter, memberRouter } from './routers';
+import { DataSource } from 'typeorm';
 import AppDataSource from './app-data-source';
 
-const app = express(),
-  port = 4000;
-
 // DB 연결
-AppDataSource;
+const datasource: DataSource = AppDataSource;
+
+const app: Express = express(),
+  port: number = 4000;
 
 app.use('/api/auction', auctionRouter);
-app.use('/api/bid', bidRouter);
+app.use('/api/bid', bidRouter(datasource));
 app.use('/api/member', memberRouter);
 
 app

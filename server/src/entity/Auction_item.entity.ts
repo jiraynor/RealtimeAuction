@@ -14,11 +14,11 @@ export class Auction_item extends BaseEntity {
   auction_num: number;
 
   // 물건 이름
-  @Column({ type: 'string', nullable: false, length: 100 })
+  @Column({ type: 'varchar', nullable: false, length: 100 })
   item_name: string;
 
   // 물건 종류
-  @Column({ type: 'string', nullable: false, length: 20 })
+  @Column({ type: 'varchar', nullable: false, length: 20 })
   item_category: string;
 
   // 물건 수량
@@ -58,7 +58,7 @@ export class Auction_item extends BaseEntity {
     eager: true,
     nullable: false,
   })
-  saler_id: string;
+  saler_id: Member;
 
   // 낙찰 여부
   @Column({ nullable: false, default: false })
@@ -68,7 +68,7 @@ export class Auction_item extends BaseEntity {
   @ManyToOne(() => Member, (member) => member.id, {
     eager: true,
   })
-  successful_bidder_id: String;
+  successful_bidder: Member;
 
   // 낙찰 가격
   @Column({ type: 'int', default: null })
