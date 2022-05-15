@@ -15,6 +15,7 @@ const WalletModal = (props: any) => {
 
   const depositHandler = () => {
     const body = {
+      id,
       amount,
     };
     axios
