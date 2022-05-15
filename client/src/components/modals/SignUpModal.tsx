@@ -208,12 +208,7 @@ const SignUpModal = (props: any) => {
   };
 
   return (
-    <Modal
-      {...props}
-      size="lg"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
+    <Modal {...props} size="lg" centered>
       <Modal.Header>
         <Modal.Title>회원가입</Modal.Title>
       </Modal.Header>
