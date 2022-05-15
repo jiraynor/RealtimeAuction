@@ -1,4 +1,4 @@
-import { Sequelize, DataType, Model, DataTypes } from 'sequelize';
+import { Sequelize, Model, DataTypes } from 'sequelize';
 
 const Member = (sequelize) => {
   const member = sequelize.define('Member', {
@@ -41,6 +41,8 @@ const Member = (sequelize) => {
       allowNull: false,
     },
   });
+
+  return member;
 };
 
 export default Member;
