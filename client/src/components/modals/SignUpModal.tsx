@@ -161,7 +161,7 @@ const SignUpModal = (props: any) => {
       account_num.length === 0 ||
       bank_code.length === 0
     ) {
-      setSubmitMessage('비고를 제외한 모든 값을 입력해주세요.');
+      setSubmitMessage('모든 값을 입력해주세요.');
       return;
     }
 
@@ -200,7 +200,6 @@ const SignUpModal = (props: any) => {
       .post(`/api/member/signUp`, body)
       .then((response: AxiosResponse<any, any>) => {
         if (response.status === 200) {
-          props.setStatus(true);
           close();
         } else {
           setSubmitMessage('회원가입에 실패했습니다.');
@@ -216,7 +215,7 @@ const SignUpModal = (props: any) => {
       centered
     >
       <Modal.Header>
-        <Modal.Title id="contained-modal-title-vcenter">회원가입</Modal.Title>
+        <Modal.Title>회원가입</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Row className="mb-2">
@@ -325,7 +324,7 @@ const SignUpModal = (props: any) => {
         )}
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={props.onHide}>취소</Button>
+        <Button onClick={close}>취소</Button>
         <Button onClick={onSubmitHandler}>가입</Button>
       </Modal.Footer>
     </Modal>
