@@ -1,11 +1,20 @@
-import { BaseEntity, Column, Entity, PrimaryColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  PrimaryColumn,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
+// typeORM
 @Entity()
 export class Member extends BaseEntity {
-  @PrimaryColumn()
+  // primaryColumn : Basic PK
+  // PrimaryGeneratedColumn : Auto Increment PK
+  @PrimaryGeneratedColumn()
   id: string;
 
-  @Column()
+  @Column({ type: 'varchar', length: 20, nullable: false })
   password: string;
 
   @Column()
