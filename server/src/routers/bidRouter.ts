@@ -1,4 +1,4 @@
-import { IRouter, Router } from 'express';
+import { Router } from 'express';
 import { DataSource } from 'typeorm';
 
 const bidRouter = (datasource: DataSource) => {

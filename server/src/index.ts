@@ -9,7 +9,7 @@ const datasource: DataSource = AppDataSource;
 const app: Express = express(),
   port: number = 4000;
 
-app.use('/api/auction', auctionRouter);
+app.use('/api/auction', auctionRouter(datasource));
 app.use('/api/bid', bidRouter(datasource));
 app.use('/api/member', memberRouter);
 

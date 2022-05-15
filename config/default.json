@@ -1,9 +1,0 @@
-{
-    "db" : {
-        "username": "root",
-        "password": "6546",
-        "database": "auction",
-        "host": "127.0.0.1",
-        "synchronize": true
-    }
-}

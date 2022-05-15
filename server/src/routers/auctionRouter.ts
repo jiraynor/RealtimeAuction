@@ -1,37 +1,42 @@
 import { Router } from 'express';
+import { DataSource } from 'typeorm';
 
-const auctionRouter: Router = Router();
+const auctionRouter = (datasource: DataSource) => {
+  const router: Router = Router();
 
-auctionRouter.post('/regist', (req, res, next) => {
-  console.log('auctionRegsit');
-});
+  router.post('/regist', (req, res, next) => {
+    console.log('auctionRegsit');
+  });
 
-auctionRouter.get('/get', (req, res, next) => {
-  console.log('getAuction');
-});
+  router.get('/get', (req, res, next) => {
+    console.log('getAuction');
+  });
 
-auctionRouter.patch('/update', (req, res, next) => {
-  console.log('deleteAuction');
-});
+  router.patch('/update', (req, res, next) => {
+    console.log('deleteAuction');
+  });
 
-auctionRouter.delete('/delete', (req, res, next) => {
-  console.log('deleteAuction');
-});
+  router.delete('/delete', (req, res, next) => {
+    console.log('deleteAuction');
+  });
 
-auctionRouter.get('/getRegAuctions', (req, res, next) => {
-  console.log('getRegAuctions');
-});
+  router.get('/getRegAuctions', (req, res, next) => {
+    console.log('getRegAuctions');
+  });
 
-auctionRouter.get('/getAuctions', (req, res, next) => {
-  console.log('getAuctions');
-});
+  router.get('/getAuctions', (req, res, next) => {
+    console.log('getAuctions');
+  });
 
-auctionRouter.get('/getSearchAuctions', (req, res, next) => {
-  console.log('getSearchAuctions');
-});
+  router.get('/getSearchAuctions', (req, res, next) => {
+    console.log('getSearchAuctions');
+  });
 
-auctionRouter.get('/getBidAuctions', (req, res, next) => {
-  console.log('getBidAuctions');
-});
+  router.get('/getBidAuctions', (req, res, next) => {
+    console.log('getBidAuctions');
+  });
+
+  return router;
+};
 
 export default auctionRouter;
