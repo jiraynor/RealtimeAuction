@@ -45,8 +45,8 @@ const Nav = () => {
   useEffect(() => {
     const jwt = cookies.load('authToken');
     if (jwt) {
-      const member = cookies.load('member');
-      setMember(member);
+      const member = cookies.load('member').substring(2);
+      setMember(JSON.parse(member));
       setStatus(true);
     }
   }, [status]);
