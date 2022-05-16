@@ -254,7 +254,7 @@ const memberRouter = (datasource: DataSource) => {
       console.log(member.balance);
 
       if (id == tokenId) {
-        res.status(200).json(member.balance);
+        res.status(200).json({ balance: member.balance });
       } else {
         res.status(496).end(1);
       }

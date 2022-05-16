@@ -291,33 +291,16 @@ const auctionRouter = (datasource: DataSource) => {
 
       // prettier-ignore
       let pageNum = (parseInt(page) - 1) * 10;
-
-      ///
-
-      const authorization = req.headers.authorization;
-      const token = authorization && authorization.split(' ')[1];
-
-      const jwtSecret = 'JsonWebTokenSecret';
-
-      const userToken = jwt.verify(token, jwtSecret);
-      const id = userToken['id'];
-
-      const member: Member = await memberRepository.findOneBy({ id });
-
-      ///
-
+      console.log(page);
+      console.log(search);
       try {
-        if (id) {
-          const auction = await auctionRepository.find({
-            // where: { , },
-            skip: pageNum,
-            take: 10,
-            order: { auction_num: 'DESC' },
-          });
-          res.status(200).json(auction);
-        } else {
-          res.status(496).end('실패');
-        }
+        const auction = await auctionRepository.find({
+          where: { item_name: Like(`%${search}%`) },
+          skip: pageNum,
+          take: 10,
+          order: { auction_num: 'DESC' },
+        });
+        res.status(200).json(auction);
       } catch (e) {
         res.status(496).end('토큰값 오류');
       }
