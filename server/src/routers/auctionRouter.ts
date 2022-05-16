@@ -285,7 +285,7 @@ const auctionRouter = (datasource: DataSource) => {
 
   // getSearchAuctions: 검색 경매 물건 리스트
   router.get(
-    '/getSearchAuctions',
+    '/getSearchAuctions/:page/:search',
     async (req: Request, res: Response, next: NextFunction) => {
       const { page, search } = req.params;
 
@@ -301,9 +301,7 @@ const auctionRouter = (datasource: DataSource) => {
           order: { auction_num: 'DESC' },
         });
         res.status(200).json(auction);
-      } catch (e) {
-        res.status(496).end('토큰값 오류');
-      }
+      } catch (e) {}
     }
   );
 
