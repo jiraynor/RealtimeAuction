@@ -1,21 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
-import AuctionBid from './components/views/AuctionBid';
-import AuctionItem from './components/views/AuctionItem';
-import AuctionList from './components/views/AuctionList';
+import { legacy_createStore as createStore } from 'redux';
+import { Provider, useSelector, useDispatch } from 'react-redux';
+import reducer from './reducers';
 import Nav from './components/views/Nav';
 
-function App() {
+const store = createStore(reducer);
+
+export default function App() {
   return (
-    <div className="container">
-      <Nav />
-      <div className="p-1 row">
-        <AuctionItem />
-        <AuctionBid />
+    <Provider store={store}>
+      <div className="container">
+        <Nav />
       </div>
-      <AuctionList />
-    </div>
+    </Provider>
   );
 }
-
-export default App;
