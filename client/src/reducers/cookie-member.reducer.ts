@@ -1,4 +1,4 @@
-import { SET_COOKIE_MEMBER } from '../actions/cookie_member_action';
+import { SET_COOKIE_MEMBER } from '../actions/cookie-member.action';
 
 export default function reducer(state = {}, action: any) {
   const { type, value } = action;

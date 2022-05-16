@@ -4,7 +4,8 @@ import SignInModal from '../modals/SignInModal';
 import { useSelector, useDispatch } from 'react-redux';
 import cookies from 'react-cookies';
 import axios, { AxiosResponse } from 'axios';
-import { setCookieMember } from '../../actions/cookie_member_action';
+import { setCookieMember } from '../../actions/cookie-member.action';
+import { setBalance } from '../../actions/balance.action';
 
 function Nav() {
   const dispatch = useDispatch();
@@ -47,12 +48,28 @@ function Nav() {
   };
 
   const cookie_member = useSelector((state: any) => state.cookie_member);
+  const balance = useSelector((state: any) => state.balance);
 
   useEffect(() => {
     const cookie_member = cookies.load('member');
-    console.log(cookie_member);
     if (cookie_member) {
       dispatch(setCookieMember(cookie_member));
+      const { id } = cookie_member;
+
+      const body = {
+        id,
+      };
+
+      const jwt = cookies.load('authToken');
+      axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`;
+      axios
+        .post(`/api/member/getBalance`, body)
+        .then((response: AxiosResponse<any, any>) => {
+          if (response.status === 200) {
+            const { balance } = response.data;
+            dispatch(setBalance({ value: parseInt(balance) }));
+          }
+        });
     }
   }, [cookie_member]);
 
@@ -96,7 +113,8 @@ function Nav() {
               >
                 {cookie_member.name}
               </span>{' '}
-              님의 잔액 <span className="font-weight-bold"></span>원
+              님의 잔액{' '}
+              <span className="font-weight-bold">{balance.value}</span>원
             </div>
             <button
               className="p-2 btn btn-outline-info col-sm-2"

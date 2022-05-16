@@ -1,9 +1,14 @@
 import React, { useState, MouseEvent, ChangeEvent, KeyboardEvent } from 'react';
 import { Button, Modal, Form, Row, Col, Alert } from 'react-bootstrap';
+import { useDispatch } from 'react-redux';
 import axios, { AxiosResponse } from 'axios';
 import cookies from 'react-cookies';
+import { setCookieMember } from '../../actions/cookie-member.action';
+import { setBalance } from '../../actions/balance.action';
 
 const SignInModal = (props: any) => {
+  const dispatch = useDispatch();
+
   const [id, setId] = useState<string>('');
   const [password, setPassword] = useState<string>('');
 
@@ -45,7 +50,10 @@ const SignInModal = (props: any) => {
         if (response.status === 200) {
           const { authToken, id, name, balance } = response.data;
           const member = { id, name };
+
           dispatch(setCookieMember(member));
+          dispatch(setBalance({ value: parseInt(balance) }));
+
           const expires = new Date();
           expires.setHours(expires.getHours() + 1);
           cookies.save('authToken', authToken, {
@@ -53,10 +61,12 @@ const SignInModal = (props: any) => {
             secure: true,
             expires,
           });
+
           cookies.save('member', member, {
             path: '/',
             expires,
           });
+
           close();
         }
       })

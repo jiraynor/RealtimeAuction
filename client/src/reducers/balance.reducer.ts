@@ -1,9 +1,9 @@
-import { SET_MEMBER } from '../actions/member_action';
+import { SET_BALANCE } from '../actions/balance.action';
 
 export default function reducer(state = {}, action: any) {
   const { type, value } = action;
   switch (type) {
-    case SET_MEMBER: {
+    case SET_BALANCE: {
       return {
         ...state,
         ...value,
