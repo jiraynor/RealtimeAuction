@@ -1,4 +1,4 @@
-import express, { Express } from 'express';
+import express, { Express, Request, Response, NextFunction } from 'express';
 import { auctionRouter, bidRouter, memberRouter } from './routers';
 import { DataSource } from 'typeorm';
 import AppDataSource from './app-data-source';
@@ -18,5 +18,5 @@ app.use('/api/bid', bidRouter(datasource));
 app.use('/api/member', memberRouter(datasource));
 
 app
-  .get('/', (req, res) => res.json({ message: 'Hello' }))
+  .get('/', (req, res) => res.json({ message: req['test'] }))
   .listen(port, () => console.log(`port: ${port} start`));
