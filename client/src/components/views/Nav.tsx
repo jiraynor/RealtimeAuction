@@ -5,19 +5,32 @@ import axios, { AxiosResponse } from 'axios';
 import SignInModal from '../modals/SignInModal';
 import SignUpModal from '../modals/SignUpModal';
 import WalletModal from '../modals/WalletModal';
+import MemberModal from '../modals/MemberModal';
 
-type member = {
+type cookieMember = {
   id: string;
   name: string;
 };
 
+type member = {
+  id: string;
+  name: string;
+  address: string;
+  tel: string;
+  email: string;
+  account_num: string;
+  bank_code: string;
+};
+
 const Nav = () => {
+  const [cookieMember, setCookieMember] = useState<cookieMember>();
   const [member, setMember] = useState<member>();
   const [balance, setBalance] = useState<number>(0);
   const [status, setStatus] = useState<boolean>(false);
   const [signUpShow, setSignUpShow] = useState<boolean>(false);
   const [signInShow, setSignInShow] = useState<boolean>(false);
   const [walletShow, setWalletShow] = useState<boolean>(false);
+  const [memberShow, setMemberShow] = useState<boolean>(false);
 
   const signUpCloseHandler = () => setSignUpShow(false);
   const signUpShowHandler = () => setSignUpShow(true);
@@ -25,6 +38,20 @@ const Nav = () => {
   const signInShowHandler = () => setSignInShow(true);
   const walletCloseHandler = () => setWalletShow(false);
   const walletShowHandler = () => setWalletShow(true);
+  const memberCloseHandler = () => setMemberShow(false);
+  const memberShowHandler = () => {
+    const jwt = cookies.load('authToken');
+    axios
+      .get(`/api/member/${cookieMember && cookieMember.id}`)
+      .then((response: AxiosResponse<any, any>) => {
+        if (response.status === 200) {
+          setMember(response.data);
+          setMemberShow(true);
+        } else {
+          return;
+        }
+      });
+  };
 
   const signOutHandler = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -32,7 +59,7 @@ const Nav = () => {
       .get(`/api/member/signOut`)
       .then((response: AxiosResponse<any, any>) => {
         if (response.status === 200) {
-          setMember(undefined);
+          setCookieMember(undefined);
           setStatus(false);
         } else {
           return;
@@ -40,13 +67,11 @@ const Nav = () => {
       });
   };
 
-  const getBalance = () => {};
-
   useEffect(() => {
     const jwt = cookies.load('authToken');
     if (jwt) {
       const member = cookies.load('member').substring(2);
-      setMember(JSON.parse(member));
+      setCookieMember(JSON.parse(member));
       setStatus(true);
     }
   }, [status]);
@@ -73,7 +98,7 @@ const Nav = () => {
           </div>
         </div>
       )}
-      {status && member && (
+      {status && cookieMember && (
         <div className="m-4">
           <div className="row">
             <button
@@ -83,8 +108,8 @@ const Nav = () => {
               로그아웃
             </button>
             <div className="p-2 col-sm-8 text-center">
-              <span className="font-weight-bold">{member.name}</span> 님의 잔액{' '}
-              <span className="font-weight-bold">{balance}</span>원
+              <span className="font-weight-bold">{cookieMember.name}</span> 님의
+              잔액 <span className="font-weight-bold">{balance}</span>원
             </div>
             <button
               className="p-2 btn btn-outline-info col-sm-2"
@@ -106,6 +131,11 @@ const Nav = () => {
         balance={balance}
         setBalance={setBalance}
         onHide={walletCloseHandler}
+      />
+      <MemberModal
+        show={memberShow}
+        memeber={member}
+        onHide={memberCloseHandler}
       />
     </>
   );

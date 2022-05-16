@@ -1,10 +1,10 @@
-import { Router } from 'express';
+import { Router, Request } from 'express';
 import { DataSource } from 'typeorm';
 
 const auctionRouter = (datasource: DataSource) => {
   const router: Router = Router();
 
-  router.post('/regist', (req, res, next) => {
+  router.post('/regist', (req: Request, res, next) => {
     console.log('auctionRegsit');
   });
 
