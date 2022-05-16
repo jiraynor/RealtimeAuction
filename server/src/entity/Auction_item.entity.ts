@@ -58,7 +58,7 @@ export class Auction_item extends BaseEntity {
     eager: true,
     nullable: false,
   })
-  saler_id: Member;
+  saler: Member;
 
   // 낙찰 여부
   @Column({ nullable: false, default: false })
