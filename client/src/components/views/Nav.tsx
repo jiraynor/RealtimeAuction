@@ -1,14 +1,20 @@
-import React, { useEffect, useState, MouseEvent } from 'react';
+import { useEffect, useState, MouseEvent } from 'react';
 import SignUpModal from '../modals/SignUpModal';
 import SignInModal from '../modals/SignInModal';
+import WalletModal from '../modals/WalletModal';
+import MemberModal from '../modals/MemberModal';
 import { useSelector, useDispatch } from 'react-redux';
 import cookies from 'react-cookies';
 import axios, { AxiosResponse } from 'axios';
+import { setMember } from '../../actions/member.action';
 import { setCookieMember } from '../../actions/cookie-member.action';
 import { setBalance } from '../../actions/balance.action';
 
 function Nav() {
   const dispatch = useDispatch();
+
+  const cookie_member = useSelector((state: any) => state.cookie_member);
+  const balance = useSelector((state: any) => state.balance);
 
   const [signUpShow, setSignUpShow] = useState<boolean>(false);
   const [signInShow, setSignInShow] = useState<boolean>(false);
@@ -28,6 +34,7 @@ function Nav() {
     axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`;
     axios.get(`/api/member/get`).then((response: AxiosResponse<any, any>) => {
       if (response.status === 200) {
+        dispatch(setMember(response.data));
         setMemberShow(true);
       } else {
         return;
@@ -37,18 +44,15 @@ function Nav() {
 
   const signOutHandler = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    axios
-      .get(`/api/member/signOut`)
-      .then((response: AxiosResponse<any, any>) => {
-        if (response.status === 200) {
-        } else {
-          return;
-        }
-      });
+    dispatch(setCookieMember({ id: '', name: '' }));
+    dispatch(setBalance({ balance: 0 }));
+    cookies.save('authToken', '', {
+      expires: new Date(),
+    });
+    cookies.save('member', '', {
+      expires: new Date(),
+    });
   };
-
-  const cookie_member = useSelector((state: any) => state.cookie_member);
-  const balance = useSelector((state: any) => state.balance);
 
   useEffect(() => {
     const cookie_member = cookies.load('member');
@@ -68,7 +72,7 @@ function Nav() {
         .then((response: AxiosResponse<any, any>) => {
           if (response.status === 200) {
             const { balance } = response.data;
-            dispatch(setBalance(balance));
+            dispatch(setBalance({ balance }));
           }
         });
     }
@@ -114,7 +118,8 @@ function Nav() {
               >
                 {cookie_member.name}
               </span>{' '}
-              님의 잔액 <span className="font-weight-bold">{balance}</span>원
+              님의 잔액{' '}
+              <span className="font-weight-bold">{balance.balance}</span>원
             </div>
             <button
               className="p-2 btn btn-outline-info col-sm-2"
@@ -123,6 +128,8 @@ function Nav() {
               입 / 출금
             </button>
           </div>
+          <WalletModal show={walletShow} onHide={walletCloseHandler} />
+          <MemberModal show={memberShow} onHide={memberCloseHandler} />
         </div>
       )}
     </>

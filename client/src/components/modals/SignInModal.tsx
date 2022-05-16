@@ -1,4 +1,4 @@
-import React, { useState, MouseEvent, ChangeEvent, KeyboardEvent } from 'react';
+import { useState, MouseEvent, ChangeEvent } from 'react';
 import { Button, Modal, Form, Row, Col, Alert } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import axios, { AxiosResponse } from 'axios';
@@ -52,7 +52,7 @@ const SignInModal = (props: any) => {
           const member = { id, name };
 
           dispatch(setCookieMember(member));
-          dispatch(setBalance(parseInt(balance)));
+          dispatch(setBalance({ balance: parseInt(balance) }));
 
           const expires = new Date();
           expires.setHours(expires.getHours() + 1);
