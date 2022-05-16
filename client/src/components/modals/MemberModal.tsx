@@ -8,6 +8,12 @@ import React, {
 import axios, { AxiosResponse } from 'axios';
 import { Button, Modal, Form, Row, Col, Alert } from 'react-bootstrap';
 
+interface MemberModalProps {
+  member: any;
+  show: boolean;
+  onHide(): void;
+}
+
 type member = {
   id: string;
   name: string;
@@ -18,7 +24,7 @@ type member = {
   bank_code: string;
 };
 
-const MemberModal = (props: any) => {
+const MemberModal = (props: MemberModalProps) => {
   const [member, setMemeber] = useState<member>(props.member);
 
   const [address, setAddress] = useState<string>('');
@@ -131,12 +137,13 @@ const MemberModal = (props: any) => {
   };
 
   useEffect(() => {
+    console.log('member modal');
+    console.log(props.member);
     setMemeber(props.member);
   }, [props.member]);
 
   return (
-    <Modal show={props.show} 
-     size="lg" centered>
+    <Modal show={props.show} size="lg" centered>
       <Modal.Header>
         <Modal.Title>회원정보</Modal.Title>
       </Modal.Header>

@@ -1,6 +1,10 @@
 import React, { useState, MouseEvent, ChangeEvent, KeyboardEvent } from 'react';
 import { Button, Modal, Form, Row, Col, Alert } from 'react-bootstrap';
 import axios, { AxiosResponse } from 'axios';
+import { connect } from 'react-redux';
+import { ReducerState } from '../../reducers';
+import { bindActionCreators, Dispatch } from 'redux';
+import { memberActions } from '../../actions/memberActions';
 
 const SignInModal = (props: any) => {
   const [id, setId] = useState<string>('');
@@ -43,6 +47,8 @@ const SignInModal = (props: any) => {
       .then((response: AxiosResponse<any, any>) => {
         if (response.status === 200) {
           props.setStatus(true);
+          // 구현
+          props.MemberActions.signIn();
           close();
         } else {
           setSubmitMessage('로그인 정보가 일치하지 않습니다.');
@@ -93,4 +99,11 @@ const SignInModal = (props: any) => {
   );
 };
 
-export default SignInModal;
+export default connect(
+  ({ member }: ReducerState) => ({
+    value: member.value,
+  }),
+  (dispatch: Dispatch) => ({
+    MemberActions: bindActionCreators(memberActions, dispatch),
+  })
+)(SignInModal);

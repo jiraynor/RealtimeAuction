@@ -6,6 +6,10 @@ import SignInModal from '../modals/SignInModal';
 import SignUpModal from '../modals/SignUpModal';
 import WalletModal from '../modals/WalletModal';
 import MemberModal from '../modals/MemberModal';
+import { connect } from 'react-redux';
+import { ReducerState } from '../../reducers';
+import { bindActionCreators, Dispatch } from 'redux';
+import { memberActions } from '../../actions/memberActions';
 
 type cookieMember = {
   id: string;
@@ -22,7 +26,13 @@ type member = {
   bank_code: string;
 };
 
-const Nav = () => {
+type StateProps = ReturnType<typeof mapStateToProps>;
+type DispatchProps = ReturnType<typeof mapDispatchToProps>;
+type OwnProps = {
+  status?: string;
+};
+
+const Nav = (props: any) => {
   const [cookieMember, setCookieMember] = useState<cookieMember>();
   const [member, setMember] = useState<member>();
   const [balance, setBalance] = useState<number>(0);
@@ -115,7 +125,7 @@ const Nav = () => {
               >
                 {cookieMember.name}
               </span>{' '}
-              님의 잔액 <span className="font-weight-bold">{balance}</span>원{member && member.name}
+              님의 잔액 <span className="font-weight-bold">{balance}</span>원
             </div>
             <button
               className="p-2 btn btn-outline-info col-sm-2"
@@ -140,11 +150,26 @@ const Nav = () => {
       />
       <MemberModal
         show={memberShow}
-        memeber={member}
+        member={props.member}
         onHide={memberCloseHandler}
       />
     </>
   );
 };
 
-export default Nav;
+const mapStateToProps = ({ member }: ReducerState) => ({
+  member: member.value,
+});
+
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+  MemberActions: bindActionCreators(memberActions, dispatch),
+});
+
+export default connect(
+  ({ member }: ReducerState) => ({
+    value: member.value,
+  }),
+  (dispatch: Dispatch) => ({
+    MemberActions: bindActionCreators(memberActions, dispatch),
+  })
+)(Nav);
