@@ -44,8 +44,9 @@ const Nav = () => {
     axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`;
     axios.get(`/api/member/get`).then((response: AxiosResponse<any, any>) => {
       if (response.status === 200) {
+        console.log(response.data);
         setMember(response.data);
-        setMemberShow(true);
+        //setMemberShow(true);
       } else {
         return;
       }
@@ -114,7 +115,7 @@ const Nav = () => {
               >
                 {cookieMember.name}
               </span>{' '}
-              님의 잔액 <span className="font-weight-bold">{balance}</span>원
+              님의 잔액 <span className="font-weight-bold">{balance}</span>원{member && member.name}
             </div>
             <button
               className="p-2 btn btn-outline-info col-sm-2"

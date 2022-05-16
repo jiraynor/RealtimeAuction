@@ -49,6 +49,7 @@ const memberRouter = (datasource: DataSource) => {
     }
   );
 
+  // checkId/:id : 아이디 중복 확인
   router.get(
     '/checkId/:id',
     async (req: Request, res: Response, next: NextFunction) => {
@@ -59,12 +60,10 @@ const memberRouter = (datasource: DataSource) => {
       console.log(member);
       if (member) {
         // 존재하는 아이디
-        res.status(406);
-        res.end('중복');
+        res.status(406).end('중복');
       } else {
         // 존재하지 않는 아이디
-        res.status(200);
-        res.end('중복 아님');
+        res.status(200).end('중복 아님');
       }
     }
   );
@@ -88,7 +87,7 @@ const memberRouter = (datasource: DataSource) => {
         const jwtSecret = 'JsonWebTokenSecret';
 
         const newUserToken = jwt.sign({ id }, jwtSecret, {
-          expiresIn: 60 * 15,
+          expiresIn: 60 * 60 * 1000 * 24,
         }); // 60초 * 15 = 15분
         const userInfo = { id: member.id, name: member.name };
 
@@ -96,8 +95,8 @@ const memberRouter = (datasource: DataSource) => {
         console.log(userInfo);
 
         // res.writeHead(200, {Locaiton: '/', 'Set-Cookie': authToken=${??}; Expires=${60 * 15};  Path=/,});
-        res.cookie('authToken', newUserToken, { maxAge: 60 * 60 * 1000 });
-        res.cookie('member', userInfo, { maxAge: 60 * 60 * 1000 });
+        res.cookie('authToken', newUserToken, { maxAge: 60 * 60 * 1000 * 24 });
+        res.cookie('member', userInfo, { maxAge: 60 * 60 * 1000 * 24 });
         res.status(200).send('성공');
       } else {
         // 로그인 실패
@@ -106,6 +105,7 @@ const memberRouter = (datasource: DataSource) => {
       }
     }
   );
+
   // signOut: 로그아웃
   router.get(
     '/signOut',
@@ -126,19 +126,20 @@ const memberRouter = (datasource: DataSource) => {
       const token = authorization && authorization.split(' ')[1];
 
       const jwtSecret = 'JsonWebTokenSecret';
-      res.end('0');
 
-      // if (token) {
-      //   console.log(token);
-      //   let auth = req.get('Authorization');
-      //   const userToken = auth.split(' ')[1];
-      //   jwt.verify(userToken, jwtSecret);
-      //   console.log(auth);
-      //   res.end('0');
-      // } else {
-      //   console.log(token);
-      //   res.end('1');
-      // }
+      const userToken = jwt.verify(token, jwtSecret);
+      const id = userToken['id'];
+
+      const member: Member = await memberRepository.findOneBy({ id });
+
+      member.password = '********';
+
+      if (member) {
+        console.log(member);
+        res.status(200).send(member);
+      } else {
+        res.status(496).end(1);
+      }
     }
   );
   // update: 회원 정보 수정하기
