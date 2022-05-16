@@ -87,7 +87,7 @@ const memberRouter = (datasource: DataSource) => {
         const jwtSecret = 'JsonWebTokenSecret';
 
         const newUserToken = jwt.sign({ id }, jwtSecret, {
-          expiresIn: 60 * 15,
+          expiresIn: 60 * 60 * 1000 * 24,
         }); // 60초 * 15 = 15분
         const userInfo = { id: member.id, name: member.name };
 
@@ -95,8 +95,8 @@ const memberRouter = (datasource: DataSource) => {
         console.log(userInfo);
 
         // res.writeHead(200, {Locaiton: '/', 'Set-Cookie': authToken=${??}; Expires=${60 * 15};  Path=/,});
-        res.cookie('authToken', newUserToken, { maxAge: 60 * 60 * 1000 });
-        res.cookie('member', userInfo, { maxAge: 60 * 60 * 1000 });
+        res.cookie('authToken', newUserToken, { maxAge: 60 * 60 * 1000 * 24 });
+        res.cookie('member', userInfo, { maxAge: 60 * 60 * 1000 * 24 });
         res.status(200).send('성공');
       } else {
         // 로그인 실패

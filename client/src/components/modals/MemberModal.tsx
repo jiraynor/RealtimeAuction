@@ -135,7 +135,8 @@ const MemberModal = (props: any) => {
   }, [props.member]);
 
   return (
-    <Modal {...props} size="lg" centered>
+    <Modal show={props.show} 
+     size="lg" centered>
       <Modal.Header>
         <Modal.Title>회원정보</Modal.Title>
       </Modal.Header>
@@ -191,7 +192,7 @@ const MemberModal = (props: any) => {
             <h4>
               {member && member.bank_code === '003'
                 ? '기업은행'
-                : member.bank_code == '004'
+                : member && member.bank_code == '004'
                 ? '국민은행'
                 : '농협'}
             </h4>
