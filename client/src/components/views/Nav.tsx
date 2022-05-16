@@ -41,16 +41,15 @@ const Nav = () => {
   const memberCloseHandler = () => setMemberShow(false);
   const memberShowHandler = () => {
     const jwt = cookies.load('authToken');
-    axios
-      .get(`/api/member/${cookieMember && cookieMember.id}`)
-      .then((response: AxiosResponse<any, any>) => {
-        if (response.status === 200) {
-          setMember(response.data);
-          setMemberShow(true);
-        } else {
-          return;
-        }
-      });
+    axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`;
+    axios.get(`/api/member/get`).then((response: AxiosResponse<any, any>) => {
+      if (response.status === 200) {
+        setMember(response.data);
+        setMemberShow(true);
+      } else {
+        return;
+      }
+    });
   };
 
   const signOutHandler = (e: MouseEvent<HTMLButtonElement>) => {
@@ -108,8 +107,14 @@ const Nav = () => {
               로그아웃
             </button>
             <div className="p-2 col-sm-8 text-center">
-              <span className="font-weight-bold">{cookieMember.name}</span> 님의
-              잔액 <span className="font-weight-bold">{balance}</span>원
+              <span
+                style={{ cursor: 'pointer' }}
+                className="font-weight-bold"
+                onClick={memberShowHandler}
+              >
+                {cookieMember.name}
+              </span>{' '}
+              님의 잔액 <span className="font-weight-bold">{balance}</span>원
             </div>
             <button
               className="p-2 btn btn-outline-info col-sm-2"
