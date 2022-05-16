@@ -122,9 +122,8 @@ const memberRouter = (datasource: DataSource) => {
   router.get(
     '/get',
     async (req: Request, res: Response, next: NextFunction) => {
-      const authorization = req.headers['Authorization'];
-      console.log(authorization);
-      // const token = authorization && authorization.split(' ')[1];
+      const authorization = req.headers.authorization;
+      const token = authorization && authorization.split(' ')[1];
 
       const jwtSecret = 'JsonWebTokenSecret';
       res.end('0');
