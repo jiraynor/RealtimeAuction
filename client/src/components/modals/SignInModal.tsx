@@ -52,7 +52,7 @@ const SignInModal = (props: any) => {
           const member = { id, name };
 
           dispatch(setCookieMember(member));
-          dispatch(setBalance({ value: parseInt(balance) }));
+          dispatch(setBalance(parseInt(balance)));
 
           const expires = new Date();
           expires.setHours(expires.getHours() + 1);

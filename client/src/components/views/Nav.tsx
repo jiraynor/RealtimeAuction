@@ -52,6 +52,7 @@ function Nav() {
 
   useEffect(() => {
     const cookie_member = cookies.load('member');
+
     if (cookie_member) {
       dispatch(setCookieMember(cookie_member));
       const { id } = cookie_member;
@@ -67,11 +68,11 @@ function Nav() {
         .then((response: AxiosResponse<any, any>) => {
           if (response.status === 200) {
             const { balance } = response.data;
-            dispatch(setBalance({ value: parseInt(balance) }));
+            dispatch(setBalance(balance));
           }
         });
     }
-  }, [cookie_member]);
+  }, []);
 
   return (
     <>
@@ -113,8 +114,7 @@ function Nav() {
               >
                 {cookie_member.name}
               </span>{' '}
-              님의 잔액{' '}
-              <span className="font-weight-bold">{balance.value}</span>원
+              님의 잔액 <span className="font-weight-bold">{balance}</span>원
             </div>
             <button
               className="p-2 btn btn-outline-info col-sm-2"
