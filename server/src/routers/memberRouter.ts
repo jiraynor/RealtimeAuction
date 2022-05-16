@@ -90,7 +90,6 @@ const memberRouter = (datasource: DataSource) => {
           expiresIn: 60 * 60 * 1000 * 24,
         }); // 60초 * 15 = 15분
 
-        // name: name, balance: balance
         res.status(200).json({
           authToken: newUserToken,
           id: member.id,
@@ -134,8 +133,7 @@ const memberRouter = (datasource: DataSource) => {
       member.password = '********';
 
       if (member) {
-        console.log(member);
-        res.status(200).send(member);
+        res.status(200).json(member);
       } else {
         res.status(496).end(1);
       }
