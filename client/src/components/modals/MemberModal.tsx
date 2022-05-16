@@ -125,154 +125,161 @@ const MemberModal = (props: any) => {
   };
 
   return (
-    <Modal {...props} size="lg" centered>
-      <Modal.Header>
-        <Modal.Title>회원정보</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Row className="mb-2">
-          <Col>
-            <h4>아이디 : </h4>
-          </Col>
-          <Col>
-            <h4>{member.id}</h4>
-          </Col>
-          <Col>
-            <h4>이름 : </h4>
-          </Col>
-          <Col>
-            <h4>{member.name}</h4>
-          </Col>
-        </Row>
-        <Row className="mb-2">
-          <Col>
-            <h4>휴대폰 번호 : </h4>
-          </Col>
-          <Col>
-            <h4>{member.tel}</h4>
-          </Col>
-          <Col>
-            <h4>이메일 : </h4>
-          </Col>
-          <Col>
-            <h4>{member.email}</h4>
-          </Col>
-        </Row>
-        <Row className="mb-2">
-          <Col>
-            <h4>주소 : </h4>
-          </Col>
-          <Col xs="3">
-            <h4>{member.address}</h4>
-          </Col>
-        </Row>
+    <>
+      {member && (
+        <Modal {...props} size="lg" centered>
+          <Modal.Header>
+            <Modal.Title>회원정보</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Row className="mb-2">
+              <Col>
+                <h4>아이디 : </h4>
+              </Col>
+              <Col>
+                <h4>{member.id}</h4>
+              </Col>
+              <Col>
+                <h4>이름 : </h4>
+              </Col>
+              <Col>
+                <h4>{member.name}</h4>
+              </Col>
+            </Row>
+            <Row className="mb-2">
+              <Col>
+                <h4>휴대폰 번호 : </h4>
+              </Col>
+              <Col>
+                <h4>{member.tel}</h4>
+              </Col>
+              <Col>
+                <h4>이메일 : </h4>
+              </Col>
+              <Col>
+                <h4>{member.email}</h4>
+              </Col>
+            </Row>
+            <Row className="mb-2">
+              <Col>
+                <h4>주소 : </h4>
+              </Col>
+              <Col xs="3">
+                <h4>{member.address}</h4>
+              </Col>
+            </Row>
 
-        <Row className="mb-2">
-          <Col>
-            <h4>계좌 번호 : </h4>
-          </Col>
-          <Col>
-            <h4>{member.account_num}</h4>
-          </Col>
-          <Col>
-            <h4>은행 : </h4>
-          </Col>
-          <Col>
-            <h4>
-              {member.bank_code === '003'
-                ? '기업은행'
-                : member.bank_code == '004'
-                ? '국민은행'
-                : '농협'}
-            </h4>
-          </Col>
-        </Row>
-        <Row className="mb-2">
-          <button
-            type="button"
-            className="m-1 btn btn-outline-danger"
-            onClick={props.onHide}
-          >
-            취소
-          </button>
-          <button
-            type="button"
-            className="m-1 btn btn-outline-warning"
-            onClick={openUpdate}
-          >
-            수정
-          </button>
-        </Row>
-        {updateShow && (
-          <>
-            <hr className="mb-2" />
             <Row className="mb-2">
               <Col>
-                <Form.Control
-                  type="text"
-                  placeholder="휴대폰 번호 (- 포함)"
-                  value={tel}
-                  onChange={onTelHandler}
-                  onKeyUp={onCheckTel}
-                />
+                <h4>계좌 번호 : </h4>
               </Col>
               <Col>
-                <Form.Control
-                  type="email"
-                  placeholder="이메일 주소"
-                  value={email}
-                  onChange={onEmailHandler}
-                />
+                <h4>{member.account_num}</h4>
               </Col>
-            </Row>
-            {telMessage && <Alert variant={'danger'}>{telMessage}</Alert>}
-            <Row className="mb-2">
               <Col>
-                <Form.Control
-                  type="text"
-                  placeholder="주소"
-                  value={address}
-                  onChange={onAddressHandler}
-                />
+                <h4>은행 : </h4>
+              </Col>
+              <Col>
+                <h4>
+                  {member.bank_code === '003'
+                    ? '기업은행'
+                    : member.bank_code == '004'
+                    ? '국민은행'
+                    : '농협'}
+                </h4>
               </Col>
             </Row>
             <Row className="mb-2">
-              <Col>
-                <Form.Control
-                  type="text"
-                  placeholder="계좌번호 (숫자만)"
-                  value={account_num}
-                  onChange={onAccount_numHandler}
-                />
-              </Col>
-              <Col>
-                <select className="form-control" onChange={onBank_codeHandler}>
-                  <option value="">은행</option>
-                  <option value="003" defaultChecked={bank_code === '003'}>
-                    기업은행
-                  </option>
-                  <option value="004" defaultChecked={bank_code === '004'}>
-                    국민은행
-                  </option>
-                  <option value="011" defaultChecked={bank_code === '011'}>
-                    농협
-                  </option>
-                </select>
-              </Col>
+              <button
+                type="button"
+                className="m-1 btn btn-outline-danger"
+                onClick={props.onHide}
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                className="m-1 btn btn-outline-warning"
+                onClick={openUpdate}
+              >
+                수정
+              </button>
             </Row>
-            {submitMessage && (
-              <Alert className="mb-2" variant={'danger'}>
-                {submitMessage}
-              </Alert>
+            {updateShow && (
+              <>
+                <hr className="mb-2" />
+                <Row className="mb-2">
+                  <Col>
+                    <Form.Control
+                      type="text"
+                      placeholder="휴대폰 번호 (- 포함)"
+                      value={tel}
+                      onChange={onTelHandler}
+                      onKeyUp={onCheckTel}
+                    />
+                  </Col>
+                  <Col>
+                    <Form.Control
+                      type="email"
+                      placeholder="이메일 주소"
+                      value={email}
+                      onChange={onEmailHandler}
+                    />
+                  </Col>
+                </Row>
+                {telMessage && <Alert variant={'danger'}>{telMessage}</Alert>}
+                <Row className="mb-2">
+                  <Col>
+                    <Form.Control
+                      type="text"
+                      placeholder="주소"
+                      value={address}
+                      onChange={onAddressHandler}
+                    />
+                  </Col>
+                </Row>
+                <Row className="mb-2">
+                  <Col>
+                    <Form.Control
+                      type="text"
+                      placeholder="계좌번호 (숫자만)"
+                      value={account_num}
+                      onChange={onAccount_numHandler}
+                    />
+                  </Col>
+                  <Col>
+                    <select
+                      className="form-control"
+                      onChange={onBank_codeHandler}
+                    >
+                      <option value="">은행</option>
+                      <option value="003" defaultChecked={bank_code === '003'}>
+                        기업은행
+                      </option>
+                      <option value="004" defaultChecked={bank_code === '004'}>
+                        국민은행
+                      </option>
+                      <option value="011" defaultChecked={bank_code === '011'}>
+                        농협
+                      </option>
+                    </select>
+                  </Col>
+                </Row>
+                {submitMessage && (
+                  <Alert className="mb-2" variant={'danger'}>
+                    {submitMessage}
+                  </Alert>
+                )}
+              </>
             )}
-          </>
-        )}
-      </Modal.Body>
-      <Modal.Footer>
-        <Button onClick={closeUpdate}>취소</Button>
-        <Button onClick={onSubmitHandler}>수정</Button>
-      </Modal.Footer>
-    </Modal>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onClick={closeUpdate}>취소</Button>
+            <Button onClick={onSubmitHandler}>수정</Button>
+          </Modal.Footer>
+        </Modal>
+      )}
+    </>
   );
 };
 
