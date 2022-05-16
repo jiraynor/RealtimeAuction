@@ -122,24 +122,24 @@ const memberRouter = (datasource: DataSource) => {
   router.get(
     '/get',
     async (req: Request, res: Response, next: NextFunction) => {
-      const authorization = req.header['Authorization'];
-      const token = authorization && authorization.split(' ')[1];
-
+      const authorization = req.headers['Authorization'];
       console.log(authorization);
+      // const token = authorization && authorization.split(' ')[1];
 
       const jwtSecret = 'JsonWebTokenSecret';
+      res.end('0');
 
-      if (token) {
-        console.log(token);
-        let auth = req.get('Authorization');
-        const userToken = auth.split(' ')[1];
-        jwt.verify(userToken, jwtSecret);
-        console.log(auth);
-        res.end('0');
-      } else {
-        console.log(token);
-        res.end('1');
-      }
+      // if (token) {
+      //   console.log(token);
+      //   let auth = req.get('Authorization');
+      //   const userToken = auth.split(' ')[1];
+      //   jwt.verify(userToken, jwtSecret);
+      //   console.log(auth);
+      //   res.end('0');
+      // } else {
+      //   console.log(token);
+      //   res.end('1');
+      // }
     }
   );
   // update: 회원 정보 수정하기
