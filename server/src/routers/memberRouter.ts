@@ -89,15 +89,14 @@ const memberRouter = (datasource: DataSource) => {
         const newUserToken = jwt.sign({ id }, jwtSecret, {
           expiresIn: 60 * 60 * 1000 * 24,
         }); // 60초 * 15 = 15분
-        const userInfo = { id: member.id, name: member.name };
 
-        console.log(newUserToken);
-        console.log(userInfo);
-
-        // res.writeHead(200, {Locaiton: '/', 'Set-Cookie': authToken=${??}; Expires=${60 * 15};  Path=/,});
-        res.cookie('authToken', newUserToken, { maxAge: 60 * 60 * 1000 * 24 });
-        res.cookie('member', userInfo, { maxAge: 60 * 60 * 1000 * 24 });
-        res.status(200).send('성공');
+        // name: name, balance: balance
+        res.status(200).json({
+          authToken: newUserToken,
+          id: member.id,
+          name: member.name,
+          balance: member.balance,
+        });
       } else {
         // 로그인 실패
         res.status(406);
@@ -142,11 +141,43 @@ const memberRouter = (datasource: DataSource) => {
       }
     }
   );
+
   // update: 회원 정보 수정하기
   router.patch(
     '/update',
     async (req: Request, res: Response, next: NextFunction) => {
-      console.log('memberUpdate');
+      const { id, name, address, tel, email, account_num, bank_code } =
+        req.body;
+
+      // const authorization = req.headers.authorization;
+      // const token = authorization && authorization.split(' ')[1];
+
+      // const jwtSecret = 'JsonWebTokenSecret';
+
+      // const userToken = jwt.verify(token, jwtSecret);
+      // const id = userToken['id'];
+
+      const member: Member = await memberRepository.findOneBy({ id });
+
+      // member.password = '********';
+
+      if (member) {
+        const member: Member = memberRepository.create({
+          id,
+          name,
+          address,
+          tel,
+          email,
+          account_num,
+          bank_code,
+        });
+
+        await memberRepository.save(member);
+
+        res.status(200).send(member);
+      } else {
+        res.status(496).end(1);
+      }
     }
   );
 
