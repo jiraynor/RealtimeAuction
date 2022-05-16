@@ -231,6 +231,36 @@ const memberRouter = (datasource: DataSource) => {
     }
   );
 
+  // getBalance: 유저 잔액 가져오기
+  router.post(
+    '/getBalance',
+    async (req: Request, res: Response, next: NextFunction) => {
+      const { id } = req.body;
+
+      ///
+
+      const authorization = req.headers.authorization;
+      const token = authorization && authorization.split(' ')[1];
+
+      const jwtSecret = 'JsonWebTokenSecret';
+
+      const userToken = jwt.verify(token, jwtSecret);
+      const tokenId = userToken['id'];
+
+      const member: Member = await memberRepository.findOneBy({ id });
+
+      ///
+
+      console.log(member.balance);
+
+      if (id == tokenId) {
+        res.status(200).json(member.balance);
+      } else {
+        res.status(496).end(1);
+      }
+    }
+  );
+
   return router;
 };
 

@@ -240,12 +240,10 @@ const auctionRouter = (datasource: DataSource) => {
 
       ///
 
-      console.log(id);
-      console.log(member);
       try {
         if (id) {
           const auction = await auctionRepository.find({
-            // where: { saler: member as FindOperator<Member>},
+            where: { saler: { id } },
             skip: pageNum,
             take: 10,
             order: { auction_num: 'DESC' },
@@ -262,7 +260,7 @@ const auctionRouter = (datasource: DataSource) => {
 
   // getAuctions: 전체 경매 물건 리스트
   router.get(
-    '/getAuctions:page',
+    '/getAuctions/:page',
     async (req: Request, res: Response, next: NextFunction) => {
       const { page } = req.params;
 
@@ -289,13 +287,46 @@ const auctionRouter = (datasource: DataSource) => {
   router.get(
     '/getSearchAuctions',
     async (req: Request, res: Response, next: NextFunction) => {
-      console.log('getSearchAuctions');
+      const { page, search } = req.params;
+
+      // prettier-ignore
+      let pageNum = (parseInt(page) - 1) * 10;
+
+      ///
+
+      const authorization = req.headers.authorization;
+      const token = authorization && authorization.split(' ')[1];
+
+      const jwtSecret = 'JsonWebTokenSecret';
+
+      const userToken = jwt.verify(token, jwtSecret);
+      const id = userToken['id'];
+
+      const member: Member = await memberRepository.findOneBy({ id });
+
+      ///
+
+      try {
+        if (id) {
+          const auction = await auctionRepository.find({
+            // where: { , },
+            skip: pageNum,
+            take: 10,
+            order: { auction_num: 'DESC' },
+          });
+          res.status(200).json(auction);
+        } else {
+          res.status(496).end('실패');
+        }
+      } catch (e) {
+        res.status(496).end('토큰값 오류');
+      }
     }
   );
 
   // getBidAuctions: 입찰한 경매 물건 리스트
   router.get(
-    '/getBidAuctions',
+    '/getBidAuctions/:page',
     async (req: Request, res: Response, next: NextFunction) => {
       console.log('getBidAuctions');
     }
