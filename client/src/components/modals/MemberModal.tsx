@@ -1,4 +1,10 @@
-import React, { useState, ChangeEvent, KeyboardEvent, MouseEvent } from 'react';
+import React, {
+  useState,
+  ChangeEvent,
+  KeyboardEvent,
+  MouseEvent,
+  useEffect,
+} from 'react';
 import axios, { AxiosResponse } from 'axios';
 import { Button, Modal, Form, Row, Col, Alert } from 'react-bootstrap';
 
@@ -123,6 +129,10 @@ const MemberModal = (props: any) => {
         }
       });
   };
+
+  useEffect(() => {
+    setMemeber(props.member);
+  }, [props.member]);
 
   return (
     <>
