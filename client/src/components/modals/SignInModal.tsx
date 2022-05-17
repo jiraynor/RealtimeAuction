@@ -1,8 +1,14 @@
-import React, { useState, MouseEvent, ChangeEvent, KeyboardEvent } from 'react';
+import { useState, MouseEvent, ChangeEvent } from 'react';
 import { Button, Modal, Form, Row, Col, Alert } from 'react-bootstrap';
+import { useDispatch } from 'react-redux';
 import axios, { AxiosResponse } from 'axios';
+import cookies from 'react-cookies';
+import { setCookieMember } from '../../actions/cookie-member.action';
+import { setBalance } from '../../actions/balance.action';
 
 const SignInModal = (props: any) => {
+  const dispatch = useDispatch();
+
   const [id, setId] = useState<string>('');
   const [password, setPassword] = useState<string>('');
 
@@ -42,9 +48,30 @@ const SignInModal = (props: any) => {
       .post(`/api/member/signIn`, body)
       .then((response: AxiosResponse<any, any>) => {
         if (response.status === 200) {
-          props.setStatus(true);
+          const { authToken, id, name, balance } = response.data;
+          const member = { id, name };
+
+          dispatch(setCookieMember(member));
+          dispatch(setBalance({ balance: parseInt(balance) }));
+
+          const expires = new Date();
+          expires.setHours(expires.getHours() + 1);
+          cookies.save('authToken', authToken, {
+            path: '/',
+            secure: true,
+            expires,
+          });
+
+          cookies.save('member', member, {
+            path: '/',
+            expires,
+          });
+
           close();
-        } else {
+        }
+      })
+      .catch((e) => {
+        if (e.response.status === 406) {
           setSubmitMessage('로그인 정보가 일치하지 않습니다.');
         }
       });

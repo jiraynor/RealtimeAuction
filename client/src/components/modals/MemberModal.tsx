@@ -1,25 +1,12 @@
-import React, {
-  useState,
-  ChangeEvent,
-  KeyboardEvent,
-  MouseEvent,
-  useEffect,
-} from 'react';
+import { useState, ChangeEvent, KeyboardEvent, MouseEvent } from 'react';
 import axios, { AxiosResponse } from 'axios';
 import { Button, Modal, Form, Row, Col, Alert } from 'react-bootstrap';
-
-type member = {
-  id: string;
-  name: string;
-  address: string;
-  tel: string;
-  email: string;
-  account_num: string;
-  bank_code: string;
-};
+import { useSelector, useDispatch } from 'react-redux';
+import { setMember } from '../../actions/member.action';
 
 const MemberModal = (props: any) => {
-  const [member, setMemeber] = useState<member>(props.member);
+  const dispatch = useDispatch();
+  const member = useSelector((state: any) => state.member);
 
   const [address, setAddress] = useState<string>('');
   const [tel, setTel] = useState<string>('');
@@ -120,82 +107,77 @@ const MemberModal = (props: any) => {
     };
 
     axios
-      .post(`/api/member/update`, body)
+      .patch(`/api/member/update`, body)
       .then((response: AxiosResponse<any, any>) => {
         if (response.status === 200) {
-          setMemeber(response.data);
+          dispatch(setMember(response.data));
         } else {
           setSubmitMessage('수정에 실패했습니다.');
         }
       });
   };
 
-  useEffect(() => {
-    setMemeber(props.member);
-  }, [props.member]);
-
   return (
-    <Modal show={props.show} 
-     size="lg" centered>
+    <Modal show={props.show} size="lg" centered>
       <Modal.Header>
         <Modal.Title>회원정보</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Row className="mb-2">
           <Col>
-            <h4>아이디 : </h4>
+            <h5>아이디 : </h5>
           </Col>
           <Col>
-            <h4>{member && member.id}</h4>
+            <h5>{member && member.id}</h5>
           </Col>
           <Col>
-            <h4>이름 : </h4>
+            <h5>이름 : </h5>
           </Col>
           <Col>
-            <h4>{member && member.name}</h4>
+            <h5>{member && member.name}</h5>
           </Col>
         </Row>
         <Row className="mb-2">
           <Col>
-            <h4>휴대폰 번호 : </h4>
+            <h5>휴대폰 번호 : </h5>
           </Col>
           <Col>
-            <h4>{member && member.tel}</h4>
+            <h5>{member && member.tel}</h5>
           </Col>
           <Col>
-            <h4>이메일 : </h4>
+            <h5>이메일 : </h5>
           </Col>
           <Col>
-            <h4>{member && member.email}</h4>
+            <h5>{member && member.email}</h5>
           </Col>
         </Row>
         <Row className="mb-2">
           <Col>
-            <h4>주소 : </h4>
+            <h5>주소 : </h5>
           </Col>
-          <Col xs="3">
-            <h4>{member && member.address}</h4>
+          <Col>
+            <h5>{member && member.address}</h5>
           </Col>
         </Row>
 
         <Row className="mb-2">
           <Col>
-            <h4>계좌 번호 : </h4>
+            <h5>계좌 번호 : </h5>
           </Col>
           <Col>
-            <h4>{member && member.account_num}</h4>
+            <h5>{member && member.account_num}</h5>
           </Col>
           <Col>
-            <h4>은행 : </h4>
+            <h5>은행 : </h5>
           </Col>
           <Col>
-            <h4>
+            <h5>
               {member && member.bank_code === '003'
                 ? '기업은행'
                 : member && member.bank_code == '004'
                 ? '국민은행'
                 : '농협'}
-            </h4>
+            </h5>
           </Col>
         </Row>
         <Row className="mb-2">

@@ -1,32 +1,21 @@
-import React, { useEffect, useState, MouseEvent } from 'react';
-import { Button } from 'react-bootstrap';
-import cookies from 'react-cookies';
-import axios, { AxiosResponse } from 'axios';
-import SignInModal from '../modals/SignInModal';
+import { useEffect, useState, MouseEvent } from 'react';
 import SignUpModal from '../modals/SignUpModal';
+import SignInModal from '../modals/SignInModal';
 import WalletModal from '../modals/WalletModal';
 import MemberModal from '../modals/MemberModal';
+import { useSelector, useDispatch } from 'react-redux';
+import cookies from 'react-cookies';
+import axios, { AxiosResponse } from 'axios';
+import { setMember } from '../../actions/member.action';
+import { setCookieMember } from '../../actions/cookie-member.action';
+import { setBalance } from '../../actions/balance.action';
 
-type cookieMember = {
-  id: string;
-  name: string;
-};
+function Nav() {
+  const dispatch = useDispatch();
 
-type member = {
-  id: string;
-  name: string;
-  address: string;
-  tel: string;
-  email: string;
-  account_num: string;
-  bank_code: string;
-};
+  const cookie_member = useSelector((state: any) => state.cookie_member);
+  const balance = useSelector((state: any) => state.balance);
 
-const Nav = () => {
-  const [cookieMember, setCookieMember] = useState<cookieMember>();
-  const [member, setMember] = useState<member>();
-  const [balance, setBalance] = useState<number>(0);
-  const [status, setStatus] = useState<boolean>(false);
   const [signUpShow, setSignUpShow] = useState<boolean>(false);
   const [signInShow, setSignInShow] = useState<boolean>(false);
   const [walletShow, setWalletShow] = useState<boolean>(false);
@@ -39,14 +28,14 @@ const Nav = () => {
   const walletCloseHandler = () => setWalletShow(false);
   const walletShowHandler = () => setWalletShow(true);
   const memberCloseHandler = () => setMemberShow(false);
+
   const memberShowHandler = () => {
     const jwt = cookies.load('authToken');
     axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`;
     axios.get(`/api/member/get`).then((response: AxiosResponse<any, any>) => {
       if (response.status === 200) {
-        console.log(response.data);
-        setMember(response.data);
-        //setMemberShow(true);
+        dispatch(setMember(response.data));
+        setMemberShow(true);
       } else {
         return;
       }
@@ -55,50 +44,64 @@ const Nav = () => {
 
   const signOutHandler = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    axios
-      .get(`/api/member/signOut`)
-      .then((response: AxiosResponse<any, any>) => {
-        if (response.status === 200) {
-          setCookieMember(undefined);
-          setStatus(false);
-        } else {
-          return;
-        }
-      });
+    dispatch(setCookieMember({ id: '', name: '' }));
+    dispatch(setBalance({ balance: 0 }));
+    cookies.save('authToken', '', {
+      expires: new Date(),
+    });
+    cookies.save('member', '', {
+      expires: new Date(),
+    });
   };
 
   useEffect(() => {
-    const jwt = cookies.load('authToken');
-    if (jwt) {
-      const member = cookies.load('member').substring(2);
-      setCookieMember(JSON.parse(member));
-      setStatus(true);
+    const cookie_member = cookies.load('member');
+
+    if (cookie_member) {
+      dispatch(setCookieMember(cookie_member));
+      const { id } = cookie_member;
+
+      const body = {
+        id,
+      };
+
+      const jwt = cookies.load('authToken');
+      axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`;
+      axios
+        .post(`/api/member/getBalance`, body)
+        .then((response: AxiosResponse<any, any>) => {
+          if (response.status === 200) {
+            const { balance } = response.data;
+            dispatch(setBalance({ balance }));
+          }
+        });
     }
-  }, [status]);
+  }, []);
 
   return (
     <>
-      {!status && (
+      {!cookie_member.id && (
         <div className="m-4">
           <div className="m-1 d-flex flex-row-reverse">
-            <Button
-              className="m-1 p-2"
-              variant="outline-primary"
+            <button
+              className="m-1 p-2 btn btn-outline-primary"
               onClick={signInShowHandler}
             >
               <span className="m-4">로그인</span>
-            </Button>
-            <Button
-              className="m-1 p-2"
-              variant="outline-success"
+            </button>
+            <button
+              className="m-1 p-2 btn btn-outline-success"
               onClick={signUpShowHandler}
             >
               <span className="m-4">회원가입</span>
-            </Button>
+            </button>
           </div>
+          <SignUpModal show={signUpShow} onHide={signUpCloseHandler} />
+          <SignInModal show={signInShow} onHide={signInCloseHandler} />
         </div>
       )}
-      {status && cookieMember && (
+
+      {cookie_member.id && (
         <div className="m-4">
           <div className="row">
             <button
@@ -113,9 +116,10 @@ const Nav = () => {
                 className="font-weight-bold"
                 onClick={memberShowHandler}
               >
-                {cookieMember.name}
+                {cookie_member.name}
               </span>{' '}
-              님의 잔액 <span className="font-weight-bold">{balance}</span>원{member && member.name}
+              님의 잔액{' '}
+              <span className="font-weight-bold">{balance.balance}</span>원
             </div>
             <button
               className="p-2 btn btn-outline-info col-sm-2"
@@ -124,27 +128,12 @@ const Nav = () => {
               입 / 출금
             </button>
           </div>
+          <WalletModal show={walletShow} onHide={walletCloseHandler} />
+          <MemberModal show={memberShow} onHide={memberCloseHandler} />
         </div>
       )}
-      <SignUpModal show={signUpShow} onHide={signUpCloseHandler} />
-      <SignInModal
-        show={signInShow}
-        onHide={signInCloseHandler}
-        setStatus={setStatus}
-      />
-      <WalletModal
-        show={walletShow}
-        balance={balance}
-        setBalance={setBalance}
-        onHide={walletCloseHandler}
-      />
-      <MemberModal
-        show={memberShow}
-        memeber={member}
-        onHide={memberCloseHandler}
-      />
     </>
   );
-};
+}
 
 export default Nav;

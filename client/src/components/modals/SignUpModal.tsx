@@ -43,13 +43,17 @@ const SignUpModal = (props: any) => {
     setBank_code(e.target.value);
 
   const onCheckIdHandler = (e: MouseEvent<HTMLButtonElement>) => {
+    if (id.length === 0) setIdMessage('아이디를 입력하세요.');
     axios
       .get(`/api/member/checkId/${id}`)
       .then((response: AxiosResponse<any, any>) => {
         if (response.status === 200) {
           setIdCheck(true);
           setIdMessage('사용 가능한 아이디입니다.');
-        } else {
+        }
+      })
+      .catch((e) => {
+        if (e.response.status === 406) {
           setIdCheck(false);
           setIdMessage('사용 중인 아이디입니다.');
         }
@@ -201,7 +205,10 @@ const SignUpModal = (props: any) => {
       .then((response: AxiosResponse<any, any>) => {
         if (response.status === 200) {
           close();
-        } else {
+        }
+      })
+      .catch((e) => {
+        if (e.response.status === 422) {
           setSubmitMessage('회원가입에 실패했습니다.');
         }
       });

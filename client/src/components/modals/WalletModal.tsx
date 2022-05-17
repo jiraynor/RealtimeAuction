@@ -1,9 +1,14 @@
-import React, { useState, MouseEvent, ChangeEvent, KeyboardEvent } from 'react';
+import { useState, ChangeEvent } from 'react';
 import { Button, Modal, Form, Row, Col, Alert } from 'react-bootstrap';
 import axios, { AxiosResponse } from 'axios';
+import { useSelector, useDispatch } from 'react-redux';
+import { setBalance } from '../../actions/balance.action';
 
 const WalletModal = (props: any) => {
-  const [id, setId] = useState<string>(props.id);
+  const dispatch = useDispatch();
+  const cookie_member = useSelector((state: any) => state.cookie_member);
+  const balance = useSelector((state: any) => state.balance);
+
   const [amount, setAmount] = useState<number>(0);
 
   const [transactionMessage, setTransactionMessage] = useState<string>('');
@@ -15,14 +20,15 @@ const WalletModal = (props: any) => {
 
   const depositHandler = () => {
     const body = {
-      id,
+      id: cookie_member.id,
       amount,
     };
     axios
       .post(`/api/member/deposit`, body)
       .then((response: AxiosResponse<any, any>) => {
         if (response.status === 200) {
-          props.setBalance(response.data.balance);
+          const { balance } = response.data;
+          dispatch(setBalance({ balance }));
         } else {
           setTransactionMessage('입금에 실패했습니다.');
           return;
@@ -31,15 +37,16 @@ const WalletModal = (props: any) => {
   };
 
   const withdrawalHandler = () => {
-    const body = { 
-      id,
+    const body = {
+      id: cookie_member.id,
       amount,
     };
     axios
       .post(`/api/member/withdrawal`, body)
       .then((response: AxiosResponse<any, any>) => {
         if (response.status === 200) {
-          props.setBalance(response.data.balance);
+          const { balance } = response.data;
+          dispatch(setBalance({ balance }));
         } else {
           setTransactionMessage('출금에 실패했습니다.');
           return;
@@ -50,10 +57,10 @@ const WalletModal = (props: any) => {
   return (
     <Modal {...props} size="lg" centered>
       <Modal.Header>
-        <Modal.Title>{id}님의 지갑</Modal.Title>
+        <Modal.Title>{cookie_member.id}님의 지갑</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <h4>출금 가능 금액: {props.balance} 원</h4>
+        <h4>출금 가능 금액: {balance.balance} 원</h4>
         <Row className="mb-2">
           <Col sx="4">
             <div className="input-group mb-3">
