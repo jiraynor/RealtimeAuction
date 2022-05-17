@@ -1,5 +1,4 @@
 import AppDataSource from '../app-data-source';
-import { DataSource, Entity, EntityRepository, Repository } from 'typeorm';
 import { Member } from '../entities/Member.entity';
 import { signUpDto } from '../dtos/member.dto';
 
