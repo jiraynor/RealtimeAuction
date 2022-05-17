@@ -18,9 +18,19 @@ const bidRouter = (datasource: DataSource) => {
   router.post(
     '/set',
     async (req: Request, res: Response, next: NextFunction) => {
-      const {} = req.body;
+      const { auction_num, bider, bid_price } = req.body;
 
-      const bidLog = bidLogRepository.create;
+      const auction: Auction_item = await auctionRepository.findOneBy({
+        auction_num,
+      });
+      console.log(auction_num);
+
+      // const bidLog = bidLogRepository.create({
+      //   // auction_num: auction,
+      //   bider,
+      //   bid_price,
+      // });
+      res.end(0);
     }
   );
 
