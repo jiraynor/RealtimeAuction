@@ -4,10 +4,10 @@ import { Auction_item } from '../entities/Auction_item.entity';
 import { Member } from '../entities/Member.entity';
 import { Bid_log } from '../entities/Bid_log.entity';
 
-import * as cookieParser from 'cookie-parser';
-import jwt from 'jsonwebtoken';
-import { send } from 'process';
+import { auth } from '../utils/utility';
+
 import { MemberRepository } from '../repositories/member.repository';
+import { AuctionRepository } from '../repositories/auction.repository';
 
 // const auctionRouter = (datasource: DataSource) => {
 //   const memberRepository = datasource.getRepository(Member);
@@ -369,80 +369,32 @@ import { MemberRepository } from '../repositories/member.repository';
 //   return router;
 // };
 
-// const router: Router = Router();
+const router: Router = Router();
 
-// router.post(
-//   '/regist',
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     const {
-//       item_name,
-//       item_category,
-//       number_of_item,
-//       appraisal_value,
-//       lowest_selling_price,
-//       immediate_sale_price,
-//       item_note,
-//       deadline,
-//       pageType,
-//     } = req.body;
+router.post(
+  '/regist',
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { pageType, ...dto } = req.body;
 
-//     ///
-//     const authorization = req.headers.authorization;
-//     const token = authorization && authorization.split(' ')[1];
+    const id = auth(req.headers.authorization);
+    if (!id) res.status(401).send('권한없음');
 
-//     const jwtSecret = 'JsonWebTokenSecret';
+    const member: Member = await MemberRepository.findOne(id);
 
-//     const userToken = jwt.verify(token, jwtSecret);
-//     const id = userToken['id'];
+    //  pageType = 'all', pageType = 'my'
+    try {
+      await AuctionRepository.regist(dto, member);
 
-//     const member: Member = await MemberRepository.findOne(id);
+      const auction_list =
+        pageType === 'all'
+          ? await AuctionRepository.getPageList(1)
+          : await AuctionRepository.getPageSalerList(1, member);
 
-//     member.password = '********';
+      res.status(200).json(auction_list);
+    } catch (e) {
+      res.status(503).send('데이터베이스 오류');
+    }
+  }
+);
 
-//     ///
-//     const auction = auctionRepository.create({
-//       item_name,
-//       item_category,
-//       number_of_item,
-//       appraisal_value,
-//       lowest_selling_price,
-//       immediate_sale_price,
-//       item_note,
-//       deadline,
-//       saler: member,
-//     });
-
-//     //  pageType = 'all', pageType = 'my'
-//     try {
-//       if (id && pageType) {
-//         if (auction) {
-//           await auctionRepository.save(auction);
-
-//           if (pageType === 'all') {
-//             const postAll = await auctionRepository.find({
-//               where: { saler: { id } },
-//               skip: 0,
-//               take: 10,
-//               order: { auction_num: 'DESC' },
-//             });
-//             res.status(200).json({ all: postAll });
-//           } else if (pageType === 'my') {
-//             const postMy = await auctionRepository.find({
-//               where: { saler: { id } },
-//               skip: 0,
-//               take: 10,
-//               order: { auction_num: 'DESC' },
-//             });
-//             res.status(200).json({ all: postMy });
-//           }
-//         } else {
-//           res.status(422).end('실패');
-//         }
-//       } else {
-//         res.status(496).end('토큰 인증 실패');
-//       }
-//     } catch (e) {}
-//   }
-// );
-
-// export default router;
+export default router;
