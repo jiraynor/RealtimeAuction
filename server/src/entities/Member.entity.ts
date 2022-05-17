@@ -1,4 +1,6 @@
-import { BaseEntity, Column, Entity, PrimaryColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+import { Bid_log } from './Bid_log.entity';
+import { Auction_item } from './Auction_item.entity';
 
 @Entity('Member')
 export class Member extends BaseEntity {
@@ -28,4 +30,13 @@ export class Member extends BaseEntity {
 
   @Column({ type: 'varchar', length: 3, nullable: false })
   bank_code: string;
+
+  @OneToMany(() => Bid_log, (bid_log) => bid_log.log_num)
+  photos: Bid_log[];
+
+  @OneToMany(() => Auction_item, (auction) => auction.auction_num)
+  auctions: Auction_item[];
+
+  @OneToMany(() => Auction_item, (auction) => auction.auction_num)
+  success_auctions: Auction_item[];
 }
