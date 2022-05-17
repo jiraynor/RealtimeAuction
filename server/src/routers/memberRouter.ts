@@ -374,7 +374,7 @@ router.patch(
     dto.password = '********';
 
     try {
-      const member: Member = await MemberRepository.update(dto);
+      const member: Member = await MemberRepository.updateMember(dto);
       res.status(200).json(member);
     } catch (e) {
       res.status(401).end(1);

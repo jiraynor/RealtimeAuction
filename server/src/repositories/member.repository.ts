@@ -21,7 +21,7 @@ export const MemberRepository = AppDataSource.getRepository(Member).extend({
     return this.save(member);
   },
 
-  update(dto: updateDto) {
+  updateMember(dto: updateDto) {
     const { id, name, address, tel, email, account_num, bank_code } = dto;
 
     const member = this.create({
@@ -33,5 +33,7 @@ export const MemberRepository = AppDataSource.getRepository(Member).extend({
       account_num,
       bank_code,
     });
+
+    return this.save(member);
   },
 });

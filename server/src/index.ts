@@ -1,5 +1,5 @@
 import express, { Express, Request, Response, NextFunction } from 'express';
-import { bidRouter, memberRouter } from './routers';
+import { bidRouter, memberRouter, auctionRouter } from './routers';
 import { DataSource } from 'typeorm';
 import AppDataSource from './app-data-source';
 import cookieParser from 'cookie-parser';

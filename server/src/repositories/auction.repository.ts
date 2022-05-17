@@ -50,8 +50,6 @@ export const AuctionRepository = AppDataSource.getRepository(
       .groupBy('Bid_log.auctionAuctionNum')
       .getMany();
 
-    console.log(await bidQb);
-
     return this.createQueryBuilder('Auction_item').leftJoinAndSelect(
       'Auction_item.bids'
       // bidQb.getQuery()
