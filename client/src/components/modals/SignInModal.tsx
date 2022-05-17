@@ -31,7 +31,6 @@ const SignInModal = (props: any) => {
   };
 
   const onSubmitHandler = (e: MouseEvent<HTMLButtonElement>) => {
-    // 기본 이벤트 제거
     e.preventDefault();
 
     if (id.length === 0 || password.length === 0) {
