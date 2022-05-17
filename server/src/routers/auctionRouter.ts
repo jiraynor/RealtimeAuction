@@ -17,12 +17,12 @@ router.post('/regist', async (req: Request, res: Response) => {
     const member: Member = await MemberRepository.findOneBy({ id });
     await AuctionRepository.regist(dto, member);
 
-    const auction_list =
-      pageType === 'all'
-        ? await AuctionRepository.getPageList(1)
-        : await AuctionRepository.getPageSalerList(1, member);
+    // const auction_list =
+    //   pageType === 'all'
+    //     ? await AuctionRepository.getPageList(1)
+    //     : await AuctionRepository.getPageSalerList(1, member);
 
-    res.status(200).json(auction_list);
+    res.status(200).json(/*auction_list*/ {});
   } catch (e) {
     res.status(503).send('데이터베이스 오류');
   }

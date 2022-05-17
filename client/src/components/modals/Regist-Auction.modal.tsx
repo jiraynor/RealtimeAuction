@@ -1,69 +1,210 @@
 import { useState, ChangeEvent, KeyboardEvent, MouseEvent } from 'react';
 import axios, { AxiosResponse } from 'axios';
+import cookies from 'react-cookies';
 import { Modal, Alert } from 'react-bootstrap';
 
 const RegistAuctionModal = (props: any) => {
+  const [item_name, setItemName] = useState<string>('');
+  const [item_category, setItemCategory] = useState<string>('');
+  const [number_of_item, setNumberOfItem] = useState<number>(0);
+  const [appraisal_value, setAppraisalValue] = useState<number>(0);
+  const [lowest_selling_price, setLowestSellingPrice] = useState<number>(0);
+  const [immediate_sale_price, setImmadiateSalePrice] = useState<number>(0);
+  const [item_note, setItemNote] = useState<string>('');
+  const [deadline, setDeadline] = useState<string>('');
+
+  const [submitMessage, setSubmitMessage] = useState<string>('');
+
+  const onItemNameHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    setItemName(e.target.value);
+  };
+  const onItemCategoryHandler = (e: ChangeEvent<HTMLSelectElement>) => {
+    setItemCategory(e.target.value);
+  };
+  const onNumberOfItemHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    setNumberOfItem(parseInt(e.target.value));
+  };
+  const onAppraisalValueHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    setAppraisalValue(parseInt(e.target.value));
+  };
+  const onLowestSellingPriceHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    setLowestSellingPrice(parseInt(e.target.value));
+  };
+  const onImmadiateSalePriceHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    setImmadiateSalePrice(parseInt(e.target.value));
+  };
+  const onItemNoteHandler = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    setItemNote(e.target.value);
+  };
+  const onDeadlineHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    setDeadline(e.target.value);
+  };
+
+  const close = () => {
+    setItemName('');
+    setItemCategory('');
+    setNumberOfItem(0);
+    setAppraisalValue(0);
+    setLowestSellingPrice(0);
+    setImmadiateSalePrice(0);
+    setImmadiateSalePrice(0);
+    setItemNote('');
+    setDeadline('');
+    props.onHide();
+  };
+
+  const onSubmitHandler = () => {
+    console.log('item_name:', item_name);
+    console.log('item_category:', item_category);
+    console.log('number_of_item:', number_of_item);
+    console.log('appraisal_value:', appraisal_value);
+    console.log('lowest_selling_price:', lowest_selling_price);
+    console.log('item_note:', item_note);
+    console.log('deadline:', deadline);
+    if (
+      item_name.length === 0 ||
+      item_category.length === 0 ||
+      number_of_item === 0 ||
+      appraisal_value === 0 ||
+      lowest_selling_price === 0 ||
+      item_note.length === 0 ||
+      deadline.length === 0
+    ) {
+      setSubmitMessage('최저 매각 금액을 제외한 모든 값은 필수 값입니다.');
+      return;
+    }
+
+    const body = {
+      item_name,
+      item_category,
+      number_of_item,
+      appraisal_value,
+      lowest_selling_price,
+      immediate_sale_price,
+      item_note,
+      deadline,
+      pageType: 'all',
+    };
+
+    const jwt = cookies.load('authToken');
+    axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`;
+    axios
+      .post(`/api/auction/regist`, body)
+      .then((response: AxiosResponse<any, any>) => {
+        if (response.status === 200) {
+          close();
+        }
+      })
+      .catch((e) => {
+        if (e.response.status === 422) {
+          setSubmitMessage('등록에 실패했습니다.');
+        }
+      });
+  };
+
   return (
     <Modal {...props} size="lg" centered>
       <Modal.Header>
         <Modal.Title>경매 등록</Modal.Title>
-        <Modal.Body>
-          <div className="mb-2 row">
-            <div className="col-2 p-1">물건 이름</div>
-            <div className="col-10 p-1">
-              <input type="text" className="form-control" />
-            </div>
-          </div>
-          <div className="mb-2 row">
-            <div className="col-2 p-1">물건 종류</div>
-            <div className="col-4 p-1">
-              <select className="form-control">
-                <option>1</option>
-                <option>2</option>
-                <option>3</option>
-                <option>4</option>
-              </select>
-            </div>
-            <div className="col-2 p-1">물건 수량</div>
-            <div className="col-4 p-1">
-              <input type="number" className="form-control" />
-            </div>
-          </div>
-          <div className="mb-2 row">
-            <div className="col-2 p-1">감정 평가 금액</div>
-            <div className="col-4 p-1">
-              <input type="number" className="form-control" />
-            </div>
-            <div className="col-2 p-1">최저 매각 금액</div>
-            <div className="col-4 p-1">
-              <input type="number" className="form-control" />
-            </div>
-          </div>
-          <div className="mb-2 row">
-            <div className="col-2 p-1">즉시 매입 금액</div>
-            <div className="col-4 p-1">
-              <input type="number" className="form-control" />
-            </div>
-            <div className="col-2 p-1">종료 시간</div>
-            <div className="col-4 p-1">
-              <input type="datetime" className="form-control" />
-            </div>
-          </div>
-          <div className="mb-2 row">
-            <div className="p-1">
-              <textarea rows={5} minLength={5} />
-            </div>
-          </div>
-        </Modal.Body>
-        <Modal.Footer>
-          <button type="button" className="btn btn-outline-danger">
-            취소
-          </button>
-          <button type="button" className="btn btn-outline-success">
-            등록
-          </button>
-        </Modal.Footer>
       </Modal.Header>
+      <Modal.Body>
+        <div className="mb-2 row">
+          <div className="col-2 p-2 text-center">물건 이름</div>
+          <div className="col-10 p-2">
+            <input
+              type="text"
+              className="form-control text-center"
+              onChange={onItemNameHandler}
+            />
+          </div>
+        </div>
+        <div className="mb-2 row">
+          <div className="col-2 p-2 text-center">물건 종류</div>
+          <div className="col-4 p-2">
+            <select
+              className="form-control text-center"
+              onChange={onItemCategoryHandler}
+            >
+              <option>선택</option>
+              <option value="building">건물</option>
+              <option value="clothes">옷</option>
+            </select>
+          </div>
+          <div className="col-2 p-2 text-center">물건 수량</div>
+          <div className="col-4 p-2">
+            <input
+              type="number"
+              className="form-control text-center"
+              onChange={onNumberOfItemHandler}
+            />
+          </div>
+        </div>
+        <div className="mb-2 row">
+          <div className="col-2 p-2 text-center">감정 평가 금액</div>
+          <div className="col-4 p-2">
+            <input
+              type="number"
+              className="form-control text-center"
+              onChange={onAppraisalValueHandler}
+            />
+          </div>
+          <div className="col-2 p-2 text-center">최저 매각 금액</div>
+          <div className="col-4 p-2">
+            <input
+              type="number"
+              className="form-control text-center"
+              onChange={onLowestSellingPriceHandler}
+            />
+          </div>
+        </div>
+        <div className="mb-2 row">
+          <div className="col-2 p-2 text-center">즉시 매입 금액</div>
+          <div className="col-4 p-2">
+            <input
+              type="number"
+              className="form-control text-center"
+              onChange={onImmadiateSalePriceHandler}
+            />
+          </div>
+          <div className="col-2 p-2 text-center">종료 시간</div>
+          <div className="col-4 p-2 text-center">
+            <input
+              type="date"
+              className="form-control text-center"
+              onChange={onDeadlineHandler}
+            />
+          </div>
+        </div>
+        <div className="mb-2 row">
+          <div className="col-12 p-2 text-center">물건 설명</div>
+        </div>
+        <div className="mb-2 row">
+          <div className="col-12 pl-4 pr-4">
+            <textarea
+              className="form-control"
+              rows={5}
+              minLength={5}
+              onChange={onItemNoteHandler}
+            />
+          </div>
+        </div>
+      </Modal.Body>
+      <Modal.Footer>
+        <button
+          type="button"
+          className="btn btn-outline-danger"
+          onClick={props.onHide}
+        >
+          취소
+        </button>
+        <button
+          type="button"
+          className="btn btn-outline-success"
+          onClick={onSubmitHandler}
+        >
+          등록
+        </button>
+      </Modal.Footer>
     </Modal>
   );
 };
