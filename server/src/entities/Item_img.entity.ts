@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import { Auction_item } from './Auction_item.entity';
 
-@Entity()
+@Entity('Item_img')
 export class Item_img extends BaseEntity {
   // 이미지 번호
   @PrimaryGeneratedColumn()

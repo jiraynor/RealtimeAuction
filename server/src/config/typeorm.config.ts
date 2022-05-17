@@ -1,9 +1,9 @@
 import dotenv from 'dotenv';
 import { ConnectionOptions } from 'typeorm';
-import { Auction_item } from '../entity/Auction_item.entity';
-import { Bid_log } from '../entity/Bid_log.entity';
-import { Item_img } from '../entity/Item_img.entity';
-import { Member } from '../entity/Member.entity';
+import { Auction_item } from '../entities/Auction_item.entity';
+import { Bid_log } from '../entities/Bid_log.entity';
+import { Item_img } from '../entities/Item_img.entity';
+import { Member } from '../entities/Member.entity';
 
 dotenv.config();
 

@@ -9,7 +9,7 @@ import {
 import { Auction_item } from './Auction_item.entity';
 import { Member } from './Member.entity';
 
-@Entity()
+@Entity('Bid_log')
 export class Bid_log extends BaseEntity {
   @PrimaryGeneratedColumn()
   log_num: number;
