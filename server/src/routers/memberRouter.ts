@@ -251,6 +251,7 @@ import { MemberRepository } from '../repositories/member.repository';
 
 const router: Router = Router();
 
+// signUp: 회원가입
 router.post(
   '/signUp',
   async (req: Request, res: Response, next: NextFunction) => {
@@ -272,6 +273,8 @@ router.post(
     } catch (e) {}
   }
 );
+
+// checkId/:id : 아이디 중복 확인
 router.get(
   '/checkId/:id',
   async (req: Request, res: Response, next: NextFunction) => {
@@ -289,4 +292,109 @@ router.get(
   }
 );
 
+// signIn : 로그인
+router.post(
+  '/signIn',
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id, password } = req.body;
+
+    const member: Member = await MemberRepository.findOneBy({ id });
+
+    console.log(password);
+    // bcrypt.compare -> 암호화 되어 있는 비밀번호를 복호화 시켜 비켜 해주는 것 반환값 true, false
+    const isEqualPw = await bcrypt.compare(password, member.password);
+    console.log(isEqualPw);
+
+    if (isEqualPw) {
+      // 로그인 성공
+
+      const jwtSecret = 'JsonWebTokenSecret';
+
+      const newUserToken = jwt.sign({ id }, jwtSecret, {
+        expiresIn: 60 * 60 * 1000 * 24,
+      }); // 60초 * 15 = 15분
+
+      res.status(200).json({
+        authToken: newUserToken,
+        id: member.id,
+        name: member.name,
+        balance: member.balance,
+      });
+    } else {
+      // 로그인 실패
+      res.status(406);
+      res.end('실패');
+    }
+  }
+);
+
+// signOut: 로그아웃
+//   router.get(
+//     '/signOut',
+//     async (req: Request, res: Response, next: NextFunction) => {
+//       res.clearCookie('authToken');
+//       res.clearCookie('member');
+//       res.end('성공');
+
+//       console.log('signOut');
+//     }
+//   );
+
+// get: 회원 정보 불러오기
+router.get('/get', async (req: Request, res: Response, next: NextFunction) => {
+  const authorization = req.headers.authorization;
+  const token = authorization && authorization.split(' ')[1];
+
+  const jwtSecret = 'JsonWebTokenSecret';
+
+  const userToken = jwt.verify(token, jwtSecret);
+  const id = userToken['id'];
+
+  const member: Member = await MemberRepository.findOneBy({ id });
+
+  member.password = '********';
+
+  if (member) {
+    res.status(200).json(member);
+  } else {
+    res.status(496).end(1);
+  }
+});
+
+// update: 회원 정보 수정하기
+router.patch(
+  '/update',
+  async (req: Request, res: Response, next: NextFunction) => {
+    const dto = req.body;
+
+    ///
+
+    const authorization = req.headers.authorization;
+    const token = authorization && authorization.split(' ')[1];
+
+    const jwtSecret = 'JsonWebTokenSecret';
+
+    const userToken = jwt.verify(token, jwtSecret);
+    const tokenId = userToken['id'];
+
+    // const member: Member = await MemberRepository.updateDto(dto);
+
+    ///
+
+    dto.password = '********';
+
+    // if (dto.id === tokenId) {
+    //   if (member) {
+    //     console.log('라우터 : ', dto);
+    //   } else {
+    //     res.status(496).end('토큰 인증 실패');
+    //   }
+    //   await MemberRepository.save(member);
+
+    //   res.status(200).send(dto);
+    // } else {
+    //   res.status(496).end(1);
+    // }
+  }
+);
 export default router;

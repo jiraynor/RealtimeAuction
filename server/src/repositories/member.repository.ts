@@ -22,4 +22,19 @@ export const MemberRepository = AppDataSource.getRepository(Member).extend({
       })
       .execute();
   },
+
+  update(dto: signUpDto) {
+    const { id, name, address, tel, email, account_num, bank_code } = dto;
+    // return this.createQueryBuilder('Member')
+    //   .update()
+    //   .set(Member)
+    //     id,
+    //     name,
+    //     address,
+    //     tel,
+    //     email,
+    //     account_num,
+    //     bank_code,
+    //   .execute();
+  },
 });
