@@ -13,7 +13,7 @@ const app: Express = express(),
 app.use(express.json());
 app.use(cookieParser());
 
-// app.use('/api/auction', auctionRouter(datasource));
+app.use('/api/auction', auctionRouter);
 // app.use('/api/bid', bidRouter(datasource));
 app.use('/api/member', memberRouter);
 

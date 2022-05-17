@@ -1,13 +1,14 @@
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, Repository, Like } from 'typeorm';
 import AppDataSource from '../app-data-source';
-import { registDto } from '../dtos/auction.dto';
+import { RegistDto, UpdateDto } from '../dtos/auction.dto';
 import { Auction_item } from '../entities/Auction_item.entity';
+import { Bid_log } from '../entities/Bid_log.entity';
 import { Member } from '../entities/Member.entity';
 
 export const AuctionRepository = AppDataSource.getRepository(
   Auction_item
 ).extend({
-  regist(dto: registDto, member: Member) {
+  regist(dto: RegistDto, member: Member) {
     const {
       item_name,
       item_category,
@@ -34,13 +35,27 @@ export const AuctionRepository = AppDataSource.getRepository(
     return this.save(auction);
   },
 
-  getPageList(page: number) {
+  async getPageList(page: number) {
     const pageNum = (page - 1) * 10;
-    return this.find({
-      skip: pageNum,
-      take: 10,
-      order: { auction_num: 'DESC' },
-    });
+
+    const bidQb = AppDataSource.getRepository(Bid_log)
+      .createQueryBuilder('Bid_log')
+      .select([
+        'Bid_log.log_num',
+        'MAX(Bid_log.bid_price)',
+        'Bid_log.bid_datetime',
+        'Bid_log.biderId',
+        'Bid_log.auctionAuctionNum',
+      ])
+      .groupBy('Bid_log.auctionAuctionNum')
+      .getMany();
+
+    console.log(await bidQb);
+
+    return this.createQueryBuilder('Auction_item').leftJoinAndSelect(
+      'Auction_item.bids'
+      // bidQb.getQuery()
+    );
   },
 
   getPageSalerList(page: number, saler: Member) {
@@ -51,5 +66,46 @@ export const AuctionRepository = AppDataSource.getRepository(
       take: 10,
       order: { auction_num: 'DESC' },
     });
+  },
+
+  getPageLikeList(page: number, search: string) {
+    const pageNum = (page - 1) * 10;
+    return this.find({
+      where: { item_name: Like(`%${search}%`) },
+      skip: pageNum,
+      take: 10,
+      order: { auction_num: 'DESC' },
+    });
+  },
+
+  update(dto: UpdateDto, saler: Member) {
+    const {
+      auction_num,
+      item_name,
+      item_category,
+      number_of_item,
+      appraisal_value,
+      lowest_selling_price,
+      immediate_sale_price,
+      item_note,
+      deadline,
+    } = dto;
+
+    const auction = this.create({
+      auction_num,
+      item_name,
+      item_category,
+      number_of_item,
+      appraisal_value,
+      lowest_selling_price,
+      immediate_sale_price,
+      item_note,
+      deadline,
+      saler,
+    });
+
+    this.save(auction);
+
+    return this.findOneBy({ auction_num });
   },
 });
