@@ -5,7 +5,7 @@ import AppDataSource from './app-data-source';
 import cookieParser from 'cookie-parser';
 
 // DB 연결
-const datasource: DataSource = AppDataSource;
+// const datasource: DataSource = AppDataSource;
 
 const app: Express = express(),
   port: number = 4000;
@@ -13,9 +13,9 @@ const app: Express = express(),
 app.use(express.json());
 app.use(cookieParser());
 
-app.use('/api/auction', auctionRouter(datasource));
-app.use('/api/bid', bidRouter(datasource));
-app.use('/api/member', memberRouter(datasource));
+// app.use('/api/auction', auctionRouter(datasource));
+// app.use('/api/bid', bidRouter(datasource));
+app.use('/api/member', memberRouter);
 
 app
   .get('/', (req, res) => res.json({ message: req['test'] }))

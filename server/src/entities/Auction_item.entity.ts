@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import { Member } from './Member.entity';
 
-@Entity()
+@Entity('Auction_item')
 export class Auction_item extends BaseEntity {
   // 물건 번호
   @PrimaryGeneratedColumn()

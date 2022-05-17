@@ -1,8 +1,8 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { DataSource, FindOperator, Like } from 'typeorm';
-import { Auction_item } from '../entity/Auction_item.entity';
-import { Member } from '../entity/Member.entity';
-import { Bid_log } from '../entity/Bid_log.entity';
+import { Auction_item } from '../entities/Auction_item.entity';
+import { Member } from '../entities/Member.entity';
+import { Bid_log } from '../entities/Bid_log.entity';
 
 import * as cookieParser from 'cookie-parser';
 import jwt from 'jsonwebtoken';
