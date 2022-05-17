@@ -27,6 +27,7 @@ const auctionRouter = (datasource: DataSource) => {
         immediate_sale_price,
         item_note,
         deadline,
+        pageType,
       } = req.body;
 
       ///
@@ -55,11 +56,29 @@ const auctionRouter = (datasource: DataSource) => {
         saler: member,
       });
 
+      //  pageType = 'all', pageType = 'my'
       try {
-        if (id) {
+        if (id && pageType) {
           if (auction) {
             await auctionRepository.save(auction);
-            res.status(200).end('성공');
+
+            if (pageType === 'all') {
+              const postAll = await auctionRepository.find({
+                where: { saler: { id } },
+                skip: 0,
+                take: 10,
+                order: { auction_num: 'DESC' },
+              });
+              res.status(200).json({ all: postAll });
+            } else if (pageType === 'my') {
+              const postMy = await auctionRepository.find({
+                where: { saler: { id } },
+                skip: 0,
+                take: 10,
+                order: { auction_num: 'DESC' },
+              });
+              res.status(200).json({ all: postMy });
+            }
           } else {
             res.status(422).end('실패');
           }
@@ -329,13 +348,20 @@ const auctionRouter = (datasource: DataSource) => {
 
       const member: Member = await memberRepository.findOneBy({ id });
 
-      // const bid_log: Bid_log = await bidLogRepository.find();
+      ///
 
-      // const bidLog: Bid_log = await bidLogRepository.find({
-      //   skip: pageNum,
-      //   takL: 10,
-      //   order: { auction: 'DESC' },
-      // });
+      const maxBidPrice = await bidLogRepository.findOne({
+        where: {},
+        order: { bid_price: 'DESC' },
+      });
+
+      console.log(maxBidPrice);
+
+      const bidLog: Bid_log[] = await bidLogRepository.find({
+        where: { bider: id, bid_price: 1 },
+        skip: pageNum,
+        take: 10,
+      });
     }
   );
 
