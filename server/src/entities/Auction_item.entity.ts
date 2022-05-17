@@ -3,8 +3,11 @@ import {
   Column,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Bid_log } from './Bid_log.entity';
+import { Item_img } from './Item_img.entity';
 import { Member } from './Member.entity';
 
 @Entity('Auction_item')
@@ -77,4 +80,10 @@ export class Auction_item extends BaseEntity {
   // 낙찰일
   @Column({ type: 'datetime', default: null })
   successful_bid_datetime: string;
+
+  @OneToMany(() => Bid_log, (bid_log) => bid_log.log_num)
+  bids: Bid_log[];
+
+  @OneToMany(() => Item_img, (item_img) => item_img.img_num)
+  images: Item_img[];
 }
