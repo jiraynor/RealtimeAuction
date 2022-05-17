@@ -1,8 +1,8 @@
 import { useEffect, useState, MouseEvent } from 'react';
-import SignUpModal from '../modals/SignUpModal';
-import SignInModal from '../modals/SignInModal';
-import WalletModal from '../modals/WalletModal';
-import MemberModal from '../modals/MemberModal';
+import SignUpModal from '../modals/SignUp.modal';
+import SignInModal from '../modals/SignIn.modal';
+import WalletModal from '../modals/Wallet.modal';
+import MemberModal from '../modals/Member.modal';
 import { useSelector, useDispatch } from 'react-redux';
 import cookies from 'react-cookies';
 import axios, { AxiosResponse } from 'axios';
