@@ -1,8 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { DataSource, MaxKey } from 'typeorm';
 import { Member } from '../entities/Member.entity';
+import { auth } from '../utils/utility';
 
-import * as cookieParser from 'cookie-parser';
 import jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcryptjs';
 import { MemberRepository } from '../repositories/member.repository';
@@ -294,16 +293,13 @@ router.post(
 
     const member: Member = await MemberRepository.findOneBy({ id });
 
-    console.log(password);
     // bcrypt.compare -> 암호화 되어 있는 비밀번호를 복호화 시켜 비켜 해주는 것 반환값 true, false
     const isEqualPw = await bcrypt.compare(password, member.password);
-    console.log(isEqualPw);
+    if (!isEqualPw) res.status(406).send('잘못된 비밀번호');
 
-    if (isEqualPw) {
+    try {
       // 로그인 성공
-
       const jwtSecret = 'JsonWebTokenSecret';
-
       const newUserToken = jwt.sign({ id }, jwtSecret, {
         expiresIn: 60 * 60 * 1000 * 24,
       }); // 60초 * 15 = 15분
@@ -314,10 +310,8 @@ router.post(
         name: member.name,
         balance: member.balance,
       });
-    } else {
-      // 로그인 실패
-      res.status(406);
-      res.end('실패');
+    } catch (e) {
+      res.status(503).send('토큰 생성 오류');
     }
   }
 );
@@ -336,22 +330,16 @@ router.post(
 
 // get: 회원 정보 불러오기
 router.get('/get', async (req: Request, res: Response, next: NextFunction) => {
-  const authorization = req.headers.authorization;
-  const token = authorization && authorization.split(' ')[1];
+  const id = auth(req.headers.authorization);
+  if (!id) res.status(401).send('권한없음');
 
-  const jwtSecret = 'JsonWebTokenSecret';
+  try {
+    const member: Member = await MemberRepository.findOneBy({ id });
 
-  const userToken = jwt.verify(token, jwtSecret);
-  const id = userToken['id'];
-
-  const member: Member = await MemberRepository.findOneBy({ id });
-
-  member.password = '********';
-
-  if (member) {
+    member.password = '********';
     res.status(200).json(member);
-  } else {
-    res.status(496).end(1);
+  } catch (e) {
+    res.status(503).send('데이터베이스 오류');
   }
 });
 
@@ -361,23 +349,14 @@ router.patch(
   async (req: Request, res: Response, next: NextFunction) => {
     const dto = req.body;
 
-    ///
-
-    const authorization = req.headers.authorization;
-    const token = authorization && authorization.split(' ')[1];
-
-    const jwtSecret = 'JsonWebTokenSecret';
-
-    const userToken = jwt.verify(token, jwtSecret);
-    const tokenId = userToken['id'];
-    ///
-    dto.password = '********';
+    const id = auth(req.headers.authorization);
+    if (!id) res.status(401).send('권한없음');
 
     try {
       const member: Member = await MemberRepository.updateMember(dto);
       res.status(200).json(member);
     } catch (e) {
-      res.status(401).end(1);
+      res.status(503).send('데이터베이스 오류');
     }
   }
 );
