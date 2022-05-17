@@ -369,80 +369,80 @@ import { MemberRepository } from '../repositories/member.repository';
 //   return router;
 // };
 
-const router: Router = Router();
+// const router: Router = Router();
 
-router.post(
-  '/regist',
-  async (req: Request, res: Response, next: NextFunction) => {
-    const {
-      item_name,
-      item_category,
-      number_of_item,
-      appraisal_value,
-      lowest_selling_price,
-      immediate_sale_price,
-      item_note,
-      deadline,
-      pageType,
-    } = req.body;
+// router.post(
+//   '/regist',
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     const {
+//       item_name,
+//       item_category,
+//       number_of_item,
+//       appraisal_value,
+//       lowest_selling_price,
+//       immediate_sale_price,
+//       item_note,
+//       deadline,
+//       pageType,
+//     } = req.body;
 
-    ///
-    const authorization = req.headers.authorization;
-    const token = authorization && authorization.split(' ')[1];
+//     ///
+//     const authorization = req.headers.authorization;
+//     const token = authorization && authorization.split(' ')[1];
 
-    const jwtSecret = 'JsonWebTokenSecret';
+//     const jwtSecret = 'JsonWebTokenSecret';
 
-    const userToken = jwt.verify(token, jwtSecret);
-    const id = userToken['id'];
+//     const userToken = jwt.verify(token, jwtSecret);
+//     const id = userToken['id'];
 
-    const member: Member = await MemberRepository.findOne(id);
+//     const member: Member = await MemberRepository.findOne(id);
 
-    member.password = '********';
+//     member.password = '********';
 
-    ///
-    const auction = auctionRepository.create({
-      item_name,
-      item_category,
-      number_of_item,
-      appraisal_value,
-      lowest_selling_price,
-      immediate_sale_price,
-      item_note,
-      deadline,
-      saler: member,
-    });
+//     ///
+//     const auction = auctionRepository.create({
+//       item_name,
+//       item_category,
+//       number_of_item,
+//       appraisal_value,
+//       lowest_selling_price,
+//       immediate_sale_price,
+//       item_note,
+//       deadline,
+//       saler: member,
+//     });
 
-    //  pageType = 'all', pageType = 'my'
-    try {
-      if (id && pageType) {
-        if (auction) {
-          await auctionRepository.save(auction);
+//     //  pageType = 'all', pageType = 'my'
+//     try {
+//       if (id && pageType) {
+//         if (auction) {
+//           await auctionRepository.save(auction);
 
-          if (pageType === 'all') {
-            const postAll = await auctionRepository.find({
-              where: { saler: { id } },
-              skip: 0,
-              take: 10,
-              order: { auction_num: 'DESC' },
-            });
-            res.status(200).json({ all: postAll });
-          } else if (pageType === 'my') {
-            const postMy = await auctionRepository.find({
-              where: { saler: { id } },
-              skip: 0,
-              take: 10,
-              order: { auction_num: 'DESC' },
-            });
-            res.status(200).json({ all: postMy });
-          }
-        } else {
-          res.status(422).end('실패');
-        }
-      } else {
-        res.status(496).end('토큰 인증 실패');
-      }
-    } catch (e) {}
-  }
-);
+//           if (pageType === 'all') {
+//             const postAll = await auctionRepository.find({
+//               where: { saler: { id } },
+//               skip: 0,
+//               take: 10,
+//               order: { auction_num: 'DESC' },
+//             });
+//             res.status(200).json({ all: postAll });
+//           } else if (pageType === 'my') {
+//             const postMy = await auctionRepository.find({
+//               where: { saler: { id } },
+//               skip: 0,
+//               take: 10,
+//               order: { auction_num: 'DESC' },
+//             });
+//             res.status(200).json({ all: postMy });
+//           }
+//         } else {
+//           res.status(422).end('실패');
+//         }
+//       } else {
+//         res.status(496).end('토큰 인증 실패');
+//       }
+//     } catch (e) {}
+//   }
+// );
 
-export default router;
+// export default router;

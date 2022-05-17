@@ -5,7 +5,6 @@ import { Member } from '../entities/Member.entity';
 import * as cookieParser from 'cookie-parser';
 import jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcryptjs';
-import { signUpDto } from '../dtos/member.dto';
 import { MemberRepository } from '../repositories/member.repository';
 
 // const memberRouter = (datasource: DataSource) => {
@@ -260,17 +259,12 @@ router.post(
     console.log('라우터 :', dto);
     dto.password = await bcrypt.hash(dto.password, 10);
 
-    const member = await MemberRepository.signUp(dto);
-
-    console.log(member);
-
     try {
-      if (member) {
-        res.status(200).end('성공');
-      } else {
-        res.status(422).end('실패');
-      }
-    } catch (e) {}
+      const member = await MemberRepository.signUp(dto);
+      res.status(200).end('성공');
+    } catch (e) {
+      res.status(422).end('실패');
+    }
   }
 );
 
@@ -376,25 +370,15 @@ router.patch(
 
     const userToken = jwt.verify(token, jwtSecret);
     const tokenId = userToken['id'];
-
-    // const member: Member = await MemberRepository.updateDto(dto);
-
     ///
-
     dto.password = '********';
 
-    // if (dto.id === tokenId) {
-    //   if (member) {
-    //     console.log('라우터 : ', dto);
-    //   } else {
-    //     res.status(496).end('토큰 인증 실패');
-    //   }
-    //   await MemberRepository.save(member);
-
-    //   res.status(200).send(dto);
-    // } else {
-    //   res.status(496).end(1);
-    // }
+    try {
+      const member: Member = await MemberRepository.update(dto);
+      res.status(200).json(member);
+    } catch (e) {
+      res.status(401).end(1);
+    }
   }
 );
 export default router;
