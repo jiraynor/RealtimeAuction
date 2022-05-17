@@ -2,6 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { DataSource, FindOperator, Like } from 'typeorm';
 import { Auction_item } from '../entity/Auction_item.entity';
 import { Member } from '../entity/Member.entity';
+import { Bid_log } from '../entity/Bid_log.entity';
 
 import * as cookieParser from 'cookie-parser';
 import jwt from 'jsonwebtoken';
@@ -10,6 +11,7 @@ import { send } from 'process';
 const auctionRouter = (datasource: DataSource) => {
   const memberRepository = datasource.getRepository(Member);
   const auctionRepository = datasource.getRepository(Auction_item);
+  const bidLogRepository = datasource.getRepository(Bid_log);
   const router: Router = Router();
 
   // regist: 경매 물건 등록
@@ -25,6 +27,7 @@ const auctionRouter = (datasource: DataSource) => {
         immediate_sale_price,
         item_note,
         deadline,
+        pageType,
       } = req.body;
 
       ///
@@ -53,11 +56,29 @@ const auctionRouter = (datasource: DataSource) => {
         saler: member,
       });
 
+      //  pageType = 'all', pageType = 'my'
       try {
-        if (id) {
+        if (id && pageType) {
           if (auction) {
             await auctionRepository.save(auction);
-            res.status(200).end('성공');
+
+            if (pageType === 'all') {
+              const postAll = await auctionRepository.find({
+                where: { saler: { id } },
+                skip: 0,
+                take: 10,
+                order: { auction_num: 'DESC' },
+              });
+              res.status(200).json({ all: postAll });
+            } else if (pageType === 'my') {
+              const postMy = await auctionRepository.find({
+                where: { saler: { id } },
+                skip: 0,
+                take: 10,
+                order: { auction_num: 'DESC' },
+              });
+              res.status(200).json({ all: postMy });
+            }
           } else {
             res.status(422).end('실패');
           }
@@ -241,7 +262,7 @@ const auctionRouter = (datasource: DataSource) => {
       ///
 
       try {
-        if (id) {
+        if (id == member.id) {
           const auction = await auctionRepository.find({
             where: { saler: { id } },
             skip: pageNum,
@@ -291,8 +312,7 @@ const auctionRouter = (datasource: DataSource) => {
 
       // prettier-ignore
       let pageNum = (parseInt(page) - 1) * 10;
-      console.log(page);
-      console.log(search);
+
       try {
         const auction = await auctionRepository.find({
           where: { item_name: Like(`%${search}%`) },
@@ -309,7 +329,39 @@ const auctionRouter = (datasource: DataSource) => {
   router.get(
     '/getBidAuctions/:page',
     async (req: Request, res: Response, next: NextFunction) => {
-      console.log('getBidAuctions');
+      // auction_itmem : auction_status(경매 시작 여부),
+      // bid_log : bidder_id(입찰자 아이디), bid_price(입찰 금액), bid_datatime(입찰 금액)
+      const { page } = req.params;
+
+      // prettier-ignore
+      let pageNum = (parseInt(page) - 1) * 10;
+
+      ///
+
+      const authorization = req.headers.authorization;
+      const token = authorization && authorization.split(' ')[1];
+
+      const jwtSecret = 'JsonWebTokenSecret';
+
+      const userToken = jwt.verify(token, jwtSecret);
+      const id = userToken['id'];
+
+      const member: Member = await memberRepository.findOneBy({ id });
+
+      ///
+
+      const maxBidPrice = await bidLogRepository.findOne({
+        where: {},
+        order: { bid_price: 'DESC' },
+      });
+
+      console.log(maxBidPrice);
+
+      const bidLog: Bid_log[] = await bidLogRepository.find({
+        where: { bider: id, bid_price: 1 },
+        skip: pageNum,
+        take: 10,
+      });
     }
   );
 
