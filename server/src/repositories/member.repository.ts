@@ -1,5 +1,5 @@
 import AppDataSource from '../app-data-source';
-import { Member } from '../entities/Member.entity';
+import { Member } from '../entities';
 import { signUpDto, updateDto } from '../dtos/member.dto';
 
 export const MemberRepository = AppDataSource.getRepository(Member).extend({

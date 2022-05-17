@@ -1,9 +1,7 @@
-import { DataSource, Repository, Like } from 'typeorm';
+import { Like } from 'typeorm';
 import AppDataSource from '../app-data-source';
 import { RegistDto, UpdateDto } from '../dtos/auction.dto';
-import { Auction_item } from '../entities/Auction_item.entity';
-import { Bid_log } from '../entities/Bid_log.entity';
-import { Member } from '../entities/Member.entity';
+import { Auction_item, Bid_log, Member } from '../entities';
 
 export const AuctionRepository = AppDataSource.getRepository(
   Auction_item
