@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { DataSource } from 'typeorm';
+import { DataSource, MaxKey } from 'typeorm';
 import { Member } from '../entity/Member.entity';
 
 import * as cookieParser from 'cookie-parser';

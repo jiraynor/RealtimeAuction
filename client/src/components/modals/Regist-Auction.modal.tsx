@@ -44,25 +44,14 @@ const RegistAuctionModal = (props: any) => {
             <div className="col-4 p-1">
               <input type="number" className="form-control" />
             </div>
-            <div className="col-2 p-1"></div>
-            <div className="col-4 p-1"></div>
-          </div>
-          <div className="mb-2 row">
-            <div className="p-1">설명</div>
+            <div className="col-2 p-1">종료 시간</div>
+            <div className="col-4 p-1">
+              <input type="datetime" className="form-control" />
+            </div>
           </div>
           <div className="mb-2 row">
             <div className="p-1">
               <textarea rows={5} minLength={5} />
-            </div>
-          </div>
-          <div className="mb-2 row">
-            <div className="col-2 p-1">시작 시간</div>
-            <div className="col-4 p-1">
-              <input type="datetime" className="form-control" />
-            </div>
-            <div className="col-2 p-1">종료 시간</div>
-            <div className="col-4 p-1">
-              <input type="datetime" className="form-control" />
             </div>
           </div>
         </Modal.Body>
