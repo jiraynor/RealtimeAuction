@@ -61,9 +61,7 @@ router.post('/set', async (req: Request, res: Response, next: NextFunction) => {
 router.post(
   '/immediate',
   async (req: Request, res: Response, next: NextFunction) => {
-    // req :  auction_num, bider, bid_price
-
-    const { auction_num, bid_price } = req.body;
+    const { auction_num } = req.body;
     const id = auth(req.headers.authorization);
 
     if (!id) res.status(401).send('권한없음');
@@ -72,7 +70,20 @@ router.post(
       const bider = await MemberRepository.findOneBy({ id });
       const auction_item = await AuctionRepository.findOneBy({ auction_num });
 
-      const bid = await BidRepository.immediate(auction_item, bider, bid_price);
+      if (id === auction_item.saler.id) res.status(400).send('본인상품');
+
+      console.log(auction_item.auction_status);
+      console.log(auction_item.successful_bid_status);
+
+      if (
+        auction_item.auction_status === false ||
+        auction_item.successful_bid_status === false
+      )
+        res.status(400).send('경매시작전');
+
+      await BidRepository.immediate(auction_item, bider);
+
+      await AuctionRepository.updateAuctionSuccessful(auction_item, bider);
 
       res.status(200).send('성공');
     } catch (e) {
@@ -89,13 +100,15 @@ router.get(
     // req : auction_num
     // res : log_num, auction_num, bider, bid_price, bid_datetime
 
-    const { auction_num } = req.body;
     const id = auth(req.headers.authorization);
 
     if (!id) res.status(401).send('권한없음');
 
     try {
-      const bidList = BidRepository.getBids(auction_num);
+      const bider = await MemberRepository.findOneBy({ id });
+
+      const bidList = await BidRepository.getBids(bider);
+      console.log(bidList);
       res.status(200).json(bidList);
     } catch (e) {
       console.error(e.message);

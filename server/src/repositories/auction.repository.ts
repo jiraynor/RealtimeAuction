@@ -139,4 +139,14 @@ export const AuctionRepository = AppDataSource.getRepository(
 
     return this.save(auction);
   },
+
+  async updateAuctionSuccessful(auction: Auction_item, bider: Member) {
+    auction.successful_bid_status = true;
+    auction.successful_bidder = bider;
+    auction.successful_bid_price = auction.immediate_sale_price;
+
+    auction.successful_bid_datetime = new Date().toISOString();
+
+    return this.save(auction);
+  },
 });
