@@ -1,12 +1,31 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { RegistAuctionModal } from '../modals';
+import axios, { AxiosResponse } from 'axios';
+import { setAuctionList } from '../../actions/auction-list.action';
 
 const AuctionList = () => {
+  const dispatch = useDispatch();
+
+  const auction_list = useSelector((state: any) => state.auction_list);
+
   const [registShow, setRegistShow] = useState<boolean>(false);
 
   const registCloseHandler = () => setRegistShow(false);
   const registShowHandler = () => setRegistShow(true);
+
+  useEffect(() => {
+    axios
+      .get(`/api/auction/getAuctions/${1}`)
+      .then((response: AxiosResponse<any, any>) => {
+        if (response.status === 200) {
+          dispatch(setAuctionList(response.data));
+        } else {
+          return;
+        }
+      });
+  }, []);
 
   return (
     <div className="m-1">
