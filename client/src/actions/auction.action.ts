@@ -7,6 +7,6 @@ export const setAuction = (auction: any) => ({
 });
 
 export const removeAuction = () => ({
-  type: SET_AUCTION,
-  value: {},
+  type: REMOVE_AUCTION,
+  value: { auction_item: undefined },
 });

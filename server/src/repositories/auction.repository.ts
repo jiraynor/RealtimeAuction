@@ -34,7 +34,7 @@ export const AuctionRepository = AppDataSource.getRepository(
     return this.save(auction);
   },
 
-  async getPageList(page: number) {
+  getPageList(page: number) {
     const pageNum = (page - 1) * 10;
 
     return this.find({
@@ -42,6 +42,10 @@ export const AuctionRepository = AppDataSource.getRepository(
       take: 10,
       order: { auction_num: 'DESC' },
     });
+  },
+
+  getPageSalerListCount(saler) {
+    return this.count({ where: { saler } });
   },
 
   getPageSalerList(page: number, saler: Member) {
@@ -54,6 +58,10 @@ export const AuctionRepository = AppDataSource.getRepository(
     });
   },
 
+  getPageLikeListCount(search: string) {
+    return this.count({ where: { item_name: Like(`%${search}%`) } });
+  },
+
   getPageLikeList(page: number, search: string) {
     const pageNum = (page - 1) * 10;
     return this.find({
@@ -64,13 +72,21 @@ export const AuctionRepository = AppDataSource.getRepository(
     });
   },
 
+  async getPageBidListCount(bider) {
+    const bid_logs = await BidRepository.find(bider);
+    const auction_nums: number[] = [];
+
+    for (let bid_log of bid_logs)
+      auction_nums.push(bid_log.auction.auction_num);
+
+    return this.count({ where: { auction_num: In(auction_nums) } });
+  },
+
   async getPageBidList(page: number, bider) {
     const pageNum = (page - 1) * 10;
 
     const bid_logs = await BidRepository.find(bider);
     const auction_nums: number[] = [];
-
-    console.log(bid_logs);
 
     for (let bid_log of bid_logs)
       auction_nums.push(bid_log.auction.auction_num);
@@ -109,9 +125,13 @@ export const AuctionRepository = AppDataSource.getRepository(
       saler,
     });
 
-    this.save(auction);
+    return this.save(auction);
+  },
 
-    return this.findOneBy({ auction_num });
+  startAuction(auction: Auction_item) {
+    auction.auction_status = true;
+
+    return this.save(auction);
   },
 
   async updateCurrentPrice(auction: Auction_item, bid_price: number) {

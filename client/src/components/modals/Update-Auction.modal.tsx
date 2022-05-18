@@ -2,20 +2,37 @@ import { useState, ChangeEvent, KeyboardEvent, MouseEvent } from 'react';
 import axios, { AxiosResponse } from 'axios';
 import cookies from 'react-cookies';
 import { Modal, Alert } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
-import { setAuctionList } from '../../actions/auction-list.action';
+import { useDispatch, useSelector } from 'react-redux';
+import { setAuction } from '../../actions/auction.action';
 
 const RegistAuctionModal = (props: any) => {
+  const auction = useSelector((state: any) => state.auction);
   const dispatch = useDispatch();
 
-  const [item_name, setItemName] = useState<string>('');
-  const [item_category, setItemCategory] = useState<string>('');
-  const [number_of_item, setNumberOfItem] = useState<number>(0);
-  const [appraisal_value, setAppraisalValue] = useState<number>(0);
-  const [lowest_selling_price, setLowestSellingPrice] = useState<number>(0);
-  const [immediate_sale_price, setImmadiateSalePrice] = useState<number>(0);
-  const [item_note, setItemNote] = useState<string>('');
-  const [deadline, setDeadline] = useState<string>('');
+  const [item_name, setItemName] = useState<string>(
+    auction.auction_item.item_name
+  );
+  const [item_category, setItemCategory] = useState<string>(
+    auction.auction_item.item_category
+  );
+  const [number_of_item, setNumberOfItem] = useState<number>(
+    auction.auction_item.number_of_item
+  );
+  const [appraisal_value, setAppraisalValue] = useState<number>(
+    auction.auction_item.appraisal_value
+  );
+  const [lowest_selling_price, setLowestSellingPrice] = useState<number>(
+    auction.auction_item.lowest_selling_price
+  );
+  const [immediate_sale_price, setImmadiateSalePrice] = useState<number>(
+    auction.auction_item.immediate_sale_price
+  );
+  const [item_note, setItemNote] = useState<string>(
+    auction.auction_item.item_note
+  );
+  const [deadline, setDeadline] = useState<string>(
+    auction.auction_item.deadline.substring(0, 10)
+  );
 
   const [submitMessage, setSubmitMessage] = useState<string>('');
 
@@ -44,19 +61,6 @@ const RegistAuctionModal = (props: any) => {
     setDeadline(e.target.value);
   };
 
-  const close = () => {
-    setItemName('');
-    setItemCategory('');
-    setNumberOfItem(0);
-    setAppraisalValue(0);
-    setLowestSellingPrice(0);
-    setImmadiateSalePrice(0);
-    setImmadiateSalePrice(0);
-    setItemNote('');
-    setDeadline('');
-    props.onHide();
-  };
-
   const onSubmitHandler = () => {
     if (
       item_name.length === 0 ||
@@ -72,6 +76,7 @@ const RegistAuctionModal = (props: any) => {
     }
 
     const body = {
+      auction_num: auction.auction_item.auction_num,
       item_name,
       item_category,
       number_of_item,
@@ -86,11 +91,11 @@ const RegistAuctionModal = (props: any) => {
     const jwt = cookies.load('authToken');
     axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`;
     axios
-      .post(`/api/auction/regist`, body)
+      .patch(`/api/auction/update`, body)
       .then((response: AxiosResponse<any, any>) => {
         if (response.status === 200) {
-          dispatch(setAuctionList(response.data));
-          close();
+          dispatch(setAuction(response.data));
+          props.onHide();
         }
       })
       .catch((e) => {
@@ -103,7 +108,7 @@ const RegistAuctionModal = (props: any) => {
   return (
     <Modal {...props} size="lg" centered>
       <Modal.Header>
-        <Modal.Title>경매 등록</Modal.Title>
+        <Modal.Title>경매 수정</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <div className="mb-2 row">
@@ -113,6 +118,7 @@ const RegistAuctionModal = (props: any) => {
               type="text"
               className="form-control text-center"
               onChange={onItemNameHandler}
+              value={item_name}
             />
           </div>
         </div>
@@ -124,8 +130,12 @@ const RegistAuctionModal = (props: any) => {
               onChange={onItemCategoryHandler}
             >
               <option>선택</option>
-              <option value="building">건물</option>
-              <option value="clothes">옷</option>
+              <option selected={item_category === 'building'} value="building">
+                건물
+              </option>
+              <option selected={item_category === 'clothes'} value="clothes">
+                옷
+              </option>
             </select>
           </div>
           <div className="col-2 p-2 text-center">물건 수량</div>
@@ -134,6 +144,7 @@ const RegistAuctionModal = (props: any) => {
               type="number"
               className="form-control text-center"
               onChange={onNumberOfItemHandler}
+              value={number_of_item}
             />
           </div>
         </div>
@@ -144,6 +155,7 @@ const RegistAuctionModal = (props: any) => {
               type="number"
               className="form-control text-center"
               onChange={onAppraisalValueHandler}
+              value={appraisal_value}
             />
           </div>
           <div className="col-2 p-2 text-center">최저 매각 금액</div>
@@ -152,6 +164,7 @@ const RegistAuctionModal = (props: any) => {
               type="number"
               className="form-control text-center"
               onChange={onLowestSellingPriceHandler}
+              value={lowest_selling_price}
             />
           </div>
         </div>
@@ -162,6 +175,7 @@ const RegistAuctionModal = (props: any) => {
               type="number"
               className="form-control text-center"
               onChange={onImmadiateSalePriceHandler}
+              value={immediate_sale_price}
             />
           </div>
           <div className="col-2 p-2 text-center">종료 시간</div>
@@ -170,6 +184,7 @@ const RegistAuctionModal = (props: any) => {
               type="date"
               className="form-control text-center"
               onChange={onDeadlineHandler}
+              value={deadline}
             />
           </div>
         </div>
@@ -183,6 +198,7 @@ const RegistAuctionModal = (props: any) => {
               rows={5}
               minLength={5}
               onChange={onItemNoteHandler}
+              value={item_note}
             />
           </div>
         </div>
@@ -197,10 +213,10 @@ const RegistAuctionModal = (props: any) => {
         </button>
         <button
           type="button"
-          className="btn btn-outline-success"
+          className="btn btn-outline-warning"
           onClick={onSubmitHandler}
         >
-          등록
+          수정
         </button>
       </Modal.Footer>
     </Modal>

@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import cookies from 'react-cookies';
 
 import { RegistAuctionModal } from '../modals';
 import axios, { AxiosResponse } from 'axios';
+import { setAuction } from '../../actions/auction.action';
 import { setAuctionList } from '../../actions/auction-list.action';
+import { setAuctionListType } from '../../actions/auction-list-type.action';
 
 const AuctionList = () => {
   const dispatch = useDispatch();
@@ -11,21 +14,81 @@ const AuctionList = () => {
   const auction_list = useSelector((state: any) => state.auction_list);
 
   const [registShow, setRegistShow] = useState<boolean>(false);
+  const [alertMessage, setAlertMessage] = useState<string>('');
 
   const registCloseHandler = () => setRegistShow(false);
-  const registShowHandler = () => setRegistShow(true);
 
-  useEffect(() => {
+  const getAuctionHandler = (auction_num: number) => {
+    axios
+      .get(`/api/auction/get/${auction_num}`)
+      .then((response: AxiosResponse<any, any>) => {
+        if (response.status === 200) {
+          dispatch(setAuction(response.data));
+        } else {
+          return;
+        }
+      });
+  };
+
+  const registShowHandler = () => {
+    const jwt = cookies.load('authToken');
+    if (!jwt) {
+      setAlertMessage('로그인 후 이용하실 수 있습니다.');
+      return;
+    }
+    setRegistShow(true);
+  };
+
+  const onAllAuctionsHandler = () => {
     axios
       .get(`/api/auction/getAuctions/${1}`)
       .then((response: AxiosResponse<any, any>) => {
         if (response.status === 200) {
           dispatch(setAuctionList(response.data));
+          dispatch(setAuctionListType('all'));
         } else {
           return;
         }
       });
-  }, []);
+  };
+
+  const onMyAuctionsHandler = () => {
+    const jwt = cookies.load('authToken');
+    if (!jwt) {
+      setAlertMessage('로그인 후 이용하실 수 있습니다.');
+      return;
+    }
+    axios
+      .get(`/api/auction/getMyAuctions/${1}`)
+      .then((response: AxiosResponse<any, any>) => {
+        if (response.status === 200) {
+          dispatch(setAuctionList(response.data));
+          dispatch(setAuctionListType('my'));
+        } else {
+          return;
+        }
+      });
+  };
+
+  const onBidAuctionsHandler = () => {
+    const jwt = cookies.load('authToken');
+    if (!jwt) {
+      setAlertMessage('로그인 후 이용하실 수 있습니다.');
+      return;
+    }
+    axios
+      .get(`/api/auction/getBidAuctions/${1}`)
+      .then((response: AxiosResponse<any, any>) => {
+        if (response.status === 200) {
+          dispatch(setAuctionList(response.data));
+          dispatch(setAuctionListType('bid'));
+        } else {
+          return;
+        }
+      });
+  };
+
+  useEffect(() => onAllAuctionsHandler(), []);
 
   return (
     <div className="m-1">
@@ -43,34 +106,39 @@ const AuctionList = () => {
           <thead>
             <tr>
               <th>품명</th>
-              <th>경매자</th>
-              <th>현재가</th>
-              <th>즉시 매입가</th>
-              <th>낙찰 여부</th>
+              <th className="text-center">경매자</th>
+              <th className="text-center">현재가</th>
+              <th className="text-center">즉시 매입가</th>
+              <th className="text-center" style={{ width: '10%' }}>
+                낙찰 여부
+              </th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>킥보드</td>
-              <td>lacls159</td>
-              <td>180,000</td>
-              <td>200,000</td>
-              <td>여</td>
-            </tr>
-            <tr>
-              <td>킥보드</td>
-              <td>lacls159</td>
-              <td>180,000</td>
-              <td>200,000</td>
-              <td>여</td>
-            </tr>
-            <tr>
-              <td>킥보드</td>
-              <td>lacls159</td>
-              <td>180,000</td>
-              <td>200,000</td>
-              <td>여</td>
-            </tr>
+            {auction_list.auction_list &&
+              auction_list.auction_list.map((auction: any) => (
+                <tr
+                  key={auction.auction_num}
+                  onClick={() => getAuctionHandler(auction.auction_num)}
+                >
+                  <td>{auction.item_name}</td>
+                  <td className="text-center">{auction.saler.id}</td>
+                  <td className="text-center">
+                    {auction.current_price.toLocaleString('ko-KR')} 원
+                  </td>
+                  <td className="text-center">
+                    {auction.immediate_sale_price.toLocaleString('ko-KR')} 원
+                  </td>
+                  <td className="text-center">
+                    {auction.successful_bid_satus && (
+                      <span className="badge badge-danger">낙찰</span>
+                    )}
+                    {!auction.successful_bid_satus && (
+                      <span className="badge badge-success">경매 중</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
 
@@ -116,18 +184,27 @@ const AuctionList = () => {
         </ul>
         <div className="row" style={{ marginTop: '50px' }}>
           <div className="p-1 col-3">
-            <button className="btn btn-outline-success btn-block">
+            <button
+              className="btn btn-outline-success btn-block"
+              onClick={onAllAuctionsHandler}
+            >
               전체 목록
             </button>
           </div>
           <div className="p-1 col-3">
-            <button className="btn btn-outline-success btn-block">
+            <button
+              className="btn btn-outline-success btn-block"
+              onClick={onMyAuctionsHandler}
+            >
               내 경매 목록
             </button>
           </div>
           <div className="p-1 col-3">
-            <button className="btn btn-outline-success btn-block">
-              경매 중 목록
+            <button
+              className="btn btn-outline-success btn-block"
+              onClick={onBidAuctionsHandler}
+            >
+              내 입찰 경매 목록
             </button>
           </div>
           <div className="p-1 col-3">
