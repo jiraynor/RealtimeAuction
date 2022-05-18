@@ -1,7 +1,7 @@
 import { Like } from 'typeorm';
 import AppDataSource from '../app-data-source';
 import { RegistDto, UpdateDto } from '../dtos/auction.dto';
-import { Auction_item, Bid_log, Member } from '../entities';
+import { Auction_item, Member } from '../entities';
 
 export const AuctionRepository = AppDataSource.getRepository(
   Auction_item
@@ -36,22 +36,11 @@ export const AuctionRepository = AppDataSource.getRepository(
   async getPageList(page: number) {
     const pageNum = (page - 1) * 10;
 
-    const bidQb = AppDataSource.getRepository(Bid_log)
-      .createQueryBuilder('Bid_log')
-      .select([
-        'Bid_log.log_num',
-        'MAX(Bid_log.bid_price)',
-        'Bid_log.bid_datetime',
-        'Bid_log.biderId',
-        'Bid_log.auctionAuctionNum',
-      ])
-      .groupBy('Bid_log.auctionAuctionNum')
-      .getMany();
-
-    return this.createQueryBuilder('Auction_item').leftJoinAndSelect(
-      'Auction_item.bids'
-      // bidQb.getQuery()
-    );
+    return this.find({
+      skip: pageNum,
+      take: 10,
+      order: { auction_num: 'DESC' },
+    });
   },
 
   getPageSalerList(page: number, saler: Member) {

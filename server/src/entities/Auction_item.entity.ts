@@ -56,6 +56,10 @@ export class Auction_item extends BaseEntity {
   @Column({ type: 'datetime', nullable: false })
   deadline: string;
 
+  // 현재 금액
+  @Column({ type: 'int', default: 0 })
+  current_price: number;
+
   // 판매자 아이디
   @ManyToOne(() => Member, (member) => member.id, {
     eager: true,
