@@ -63,7 +63,7 @@ export const AuctionRepository = AppDataSource.getRepository(
     });
   },
 
-  update(dto: UpdateDto, saler: Member) {
+  updateAuction(dto: UpdateDto, saler: Member) {
     const {
       auction_num,
       item_name,
@@ -92,5 +92,11 @@ export const AuctionRepository = AppDataSource.getRepository(
     this.save(auction);
 
     return this.findOneBy({ auction_num });
+  },
+
+  async updateCurrentPrice(auction: Auction_item, bid_price: number) {
+    auction.current_price = bid_price;
+
+    return this.save(auction);
   },
 });
