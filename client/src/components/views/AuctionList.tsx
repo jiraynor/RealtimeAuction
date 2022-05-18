@@ -1,6 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
+
+import { RegistAuctionModal } from '../modals';
 
 const AuctionList = () => {
+  const [registShow, setRegistShow] = useState<boolean>(false);
+
+  const registCloseHandler = () => setRegistShow(false);
+  const registShowHandler = () => setRegistShow(true);
+
   return (
     <div className="m-1">
       <div className="p-4 card">
@@ -105,12 +112,16 @@ const AuctionList = () => {
             </button>
           </div>
           <div className="p-1 col-3">
-            <button className="btn btn-outline-primary btn-block">
+            <button
+              className="btn btn-outline-primary btn-block"
+              onClick={registShowHandler}
+            >
               경매 등록
             </button>
           </div>
         </div>
       </div>
+      <RegistAuctionModal show={registShow} onHide={registCloseHandler} />
     </div>
   );
 };

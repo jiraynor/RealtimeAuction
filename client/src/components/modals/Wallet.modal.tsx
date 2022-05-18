@@ -1,6 +1,7 @@
 import { useState, ChangeEvent } from 'react';
 import { Button, Modal, Form, Row, Col, Alert } from 'react-bootstrap';
 import axios, { AxiosResponse } from 'axios';
+import cookies from 'react-cookies';
 import { useSelector, useDispatch } from 'react-redux';
 import { setBalance } from '../../actions/balance.action';
 
@@ -20,9 +21,10 @@ const WalletModal = (props: any) => {
 
   const depositHandler = () => {
     const body = {
-      id: cookie_member.id,
       amount,
     };
+    const jwt = cookies.load('authToken');
+    axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`;
     axios
       .post(`/api/member/deposit`, body)
       .then((response: AxiosResponse<any, any>) => {
@@ -38,9 +40,10 @@ const WalletModal = (props: any) => {
 
   const withdrawalHandler = () => {
     const body = {
-      id: cookie_member.id,
       amount,
     };
+    const jwt = cookies.load('authToken');
+    axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`;
     axios
       .post(`/api/member/withdrawal`, body)
       .then((response: AxiosResponse<any, any>) => {

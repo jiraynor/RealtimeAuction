@@ -25,6 +25,6 @@ export class Bid_log extends BaseEntity {
   @Column({ type: 'int', nullable: false })
   bid_price: number;
 
-  @Column({ type: 'datetime', nullable: false })
+  @Column({ type: 'datetime', nullable: false, default: () => 'now()' })
   bid_datetime: string;
 }

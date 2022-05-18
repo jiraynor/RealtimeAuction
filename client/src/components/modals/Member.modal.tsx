@@ -19,7 +19,7 @@ const MemberModal = (props: any) => {
   const [telMessage, setTelMessage] = useState<string>('');
   const [submitMessage, setSubmitMessage] = useState<string>('');
 
-  const [telCheck, setTelCheck] = useState<boolean>(false);
+  const [telCheck, setTelCheck] = useState<boolean>(true);
 
   const onAddressHandler = (e: ChangeEvent<HTMLInputElement>) => {
     setAddress(e.currentTarget.value);

@@ -1,5 +1,5 @@
 import express, { Express, Request, Response, NextFunction } from 'express';
-import { bidRouter, memberRouter } from './routers';
+import { bidRouter, memberRouter, auctionRouter } from './routers';
 import { DataSource } from 'typeorm';
 import AppDataSource from './app-data-source';
 import cookieParser from 'cookie-parser';
@@ -13,8 +13,8 @@ const app: Express = express(),
 app.use(express.json());
 app.use(cookieParser());
 
-// app.use('/api/auction', auctionRouter(datasource));
 app.use('/api/bid', bidRouter);
+app.use('/api/auction', auctionRouter);
 app.use('/api/member', memberRouter);
 
 app

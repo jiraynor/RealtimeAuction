@@ -43,7 +43,10 @@ const SignUpModal = (props: any) => {
     setBank_code(e.target.value);
 
   const onCheckIdHandler = (e: MouseEvent<HTMLButtonElement>) => {
-    if (id.length === 0) setIdMessage('아이디를 입력하세요.');
+    if (id.length === 0) {
+      setIdMessage('아이디를 입력하세요.');
+      return;
+    }
     axios
       .get(`/api/member/checkId/${id}`)
       .then((response: AxiosResponse<any, any>) => {

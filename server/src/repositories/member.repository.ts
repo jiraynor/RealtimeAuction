@@ -1,9 +1,8 @@
 import AppDataSource from '../app-data-source';
-import { Member } from '../entities/Member.entity';
+import { Member } from '../entities';
 import { signUpDto, updateDto } from '../dtos/member.dto';
 
 export const MemberRepository = AppDataSource.getRepository(Member).extend({
-  // 회원가입
   signUp(dto: signUpDto) {
     const { id, password, name, address, tel, email, account_num, bank_code } =
       dto;
@@ -22,9 +21,7 @@ export const MemberRepository = AppDataSource.getRepository(Member).extend({
     return this.save(member);
   },
 
-  // 회원 정보 수정
-  update(dto: updateDto) {
-    console.log('라우터 : ', dto);
+  updateMember(dto: updateDto) {
     const { id, name, address, tel, email, account_num, bank_code } = dto;
 
     const member = this.create({
@@ -37,8 +34,6 @@ export const MemberRepository = AppDataSource.getRepository(Member).extend({
       bank_code,
     });
 
-    this.save(member);
-
-    return this.findOneBy({ id });
+    return this.save(member);
   },
 });

@@ -26,9 +26,7 @@ router.post('/set', async (req: Request, res: Response, next: NextFunction) => {
     const bider = await MemberRepository.findOneBy({ id });
     const auction_item = await AuctionRepository.findOneBy({ auction_num });
 
-    let time = new Date();
-
-    const bid = await BidRepository.set(bid_price, bider, auction_item, time);
+    const bid = await BidRepository.set(bid_price, bider, auction_item);
 
     res.status(200).send('성공');
   } catch (e) {
@@ -41,7 +39,19 @@ router.post('/set', async (req: Request, res: Response, next: NextFunction) => {
 router.post(
   '/immediate',
   async (req: Request, res: Response, next: NextFunction) => {
-    console.log('immediate');
+    // req :  auction_num, bider, bid_price
+
+    const { auction_num, bider, bid_price } = req.body;
+    const id = auth(req.headers.authorization);
+
+    if (!id) res.status(401).send('권한없음');
+
+    try {
+      res.status(200).send('성공');
+    } catch (e) {
+      console.error(e.message);
+      res.status(503).end('실패');
+    }
   }
 );
 
@@ -49,7 +59,8 @@ router.post(
 router.get(
   '/getBids',
   async (req: Request, res: Response, next: NextFunction) => {
-    console.log('getBids');
+    // req : auction_num
+    // res : log_num, auction_num, bider, bid_price, bid_datetime
   }
 );
 

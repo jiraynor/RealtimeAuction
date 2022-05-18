@@ -6,19 +6,15 @@ import { Auction_item } from '../entities/Auction_item.entity';
 
 export const BidRepository = AppDataSource.getRepository(Bid_log).extend({
   // 입찰
-  set(
-    bid_price: number,
-    bider: Member,
-    auction: Auction_item,
-    bid_datatime: Date
-  ) {
+  set(bid_price: number, bider: Member, auction: Auction_item) {
     const bid = this.create({
       auction,
       bid_price,
       bider,
-      bid_datatime,
     });
 
     return this.save(bid);
   },
+
+  // immediate(auction_num, bider, bid_price)
 });
