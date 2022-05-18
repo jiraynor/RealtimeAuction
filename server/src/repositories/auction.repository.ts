@@ -113,4 +113,10 @@ export const AuctionRepository = AppDataSource.getRepository(
 
     return this.findOneBy({ auction_num });
   },
+
+  async updateCurrentPrice(auction: Auction_item, bid_price: number) {
+    auction.current_price = bid_price;
+
+    return this.save(auction);
+  },
 });
