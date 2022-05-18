@@ -141,7 +141,7 @@ export const AuctionRepository = AppDataSource.getRepository(
   },
 
   async updateAuctionSuccessful(auction: Auction_item, bider: Member) {
-    auction.successful_bid_status = true;
+    auction.successful_bid_status = false;
     auction.successful_bidder = bider;
     auction.successful_bid_price = auction.immediate_sale_price;
 
