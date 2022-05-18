@@ -26,7 +26,7 @@ router.post('/set', async (req: Request, res: Response, next: NextFunction) => {
     const bider = await MemberRepository.findOneBy({ id });
     const auction_item = await AuctionRepository.findOneBy({ auction_num });
 
-    const bid = await BidRepository.set(bid_price, bider, auction_item);
+    const bid = await BidRepository.set(auction_item, bider, bid_price);
 
     res.status(200).send('성공');
   } catch (e) {
@@ -41,12 +41,17 @@ router.post(
   async (req: Request, res: Response, next: NextFunction) => {
     // req :  auction_num, bider, bid_price
 
-    const { auction_num, bider, bid_price } = req.body;
+    const { auction_num, bid_price } = req.body;
     const id = auth(req.headers.authorization);
 
     if (!id) res.status(401).send('권한없음');
 
     try {
+      const bider = await MemberRepository.findOneBy({ id });
+      const auction_item = await AuctionRepository.findOneBy({ auction_num });
+
+      const bid = await BidRepository.immediate(auction_item, bider, bid_price);
+
       res.status(200).send('성공');
     } catch (e) {
       console.error(e.message);
@@ -61,6 +66,19 @@ router.get(
   async (req: Request, res: Response, next: NextFunction) => {
     // req : auction_num
     // res : log_num, auction_num, bider, bid_price, bid_datetime
+
+    const { auction_num } = req.body;
+    const id = auth(req.headers.authorization);
+
+    if (!id) res.status(401).send('권한없음');
+
+    try {
+      const bidList = BidRepository.getBids(auction_num);
+      res.status(200).json(bidList);
+    } catch (e) {
+      console.error(e.message);
+      res.status(503).end('실패');
+    }
   }
 );
 
