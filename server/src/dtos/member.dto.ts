@@ -1,3 +1,4 @@
+// 회원가입
 export class signUpDto {
   id: string;
   password: string;
@@ -9,6 +10,7 @@ export class signUpDto {
   bank_code: string;
 }
 
+// 회원정보 수정
 export class updateDto {
   id: string;
   name: string;
