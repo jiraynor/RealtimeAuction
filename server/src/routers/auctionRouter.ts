@@ -17,10 +17,10 @@ router.post('/regist', async (req: Request, res: Response) => {
     const member: Member = await MemberRepository.findOneBy({ id });
     await AuctionRepository.regist(dto, member);
 
-    // const auction_list =
-    //   pageType === 'all'
-    //     ? await AuctionRepository.getPageList(1)
-    //     : await AuctionRepository.getPageSalerList(1, member);
+    const auction_list =
+      pageType === 'all'
+        ? await AuctionRepository.getPageList(1)
+        : await AuctionRepository.getPageSalerList(1, member);
 
     res.status(200).json(/*auction_list*/ {});
   } catch (e) {
@@ -123,10 +123,6 @@ router.get('/getBidAuctions/:page', async (req: Request, res: Response) => {
   if (!id) res.status(401).send('권한없음');
 
   const member: Member = await MemberRepository.findOneBy({ id });
-});
-
-router.get('/test', async (req: Request, res: Response) => {
-  const member: Member = await AuctionRepository.getPageList(1);
 });
 
 export default router;
