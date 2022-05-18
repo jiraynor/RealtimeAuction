@@ -59,7 +59,7 @@ router.patch('/update', async (req: Request, res: Response) => {
 
     const member: Member = await MemberRepository.findOneBy({ id });
 
-    const auction_item = await AuctionRepository.update(dto, member);
+    const auction_item = await AuctionRepository.updateAuction(dto, member);
 
     res.status(200).json(auction_item);
   } catch (e) {

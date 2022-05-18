@@ -8,11 +8,11 @@ const AppDataSource = new DataSource({
   type: 'mysql',
   host: 'localhost',
   port: 3306,
-  username: 'developer',
-  password: 'qwer1234',
+  username: 'root',
+  password: '6546',
   database: 'auction',
   entities: [Member, Auction_item, Item_img, Bid_log],
-  synchronize: true,
+  synchronize: false,
   logging: false,
 });
 
