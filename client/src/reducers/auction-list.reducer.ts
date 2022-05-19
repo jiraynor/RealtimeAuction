@@ -4,6 +4,7 @@ export default function reducer(state = {}, action: any) {
   const { type, value } = action;
   switch (type) {
     case SET_AUCTION_LIST: {
+      console.log('리듀서 :', value);
       return {
         ...state,
         ...value,

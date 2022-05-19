@@ -1,5 +1,5 @@
-import auctionRouter from './auctionRouter';
-import bidRouter from './bidRouter';
-import memberRouter from './memberRouter';
+import auctionRouter from './auction.router';
+import bidRouter from './bid.router';
+import memberRouter from './member.router';
 
 export { bidRouter, memberRouter, auctionRouter };
