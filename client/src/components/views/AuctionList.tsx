@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, ChangeEvent } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import cookies from 'react-cookies';
 
@@ -12,17 +12,26 @@ const AuctionList = () => {
   const dispatch = useDispatch();
 
   const auction_list = useSelector((state: any) => state.auction_list);
+  const auction_list_type = useSelector(
+    (state: any) => state.auction_list_type
+  );
 
   const [registShow, setRegistShow] = useState<boolean>(false);
+  const [pageNum, setPageNum] = useState<number>(1);
+  const [search, setSearch] = useState<string>('');
   const [alertMessage, setAlertMessage] = useState<string>('');
 
   const registCloseHandler = () => setRegistShow(false);
+
+  const onSearchHandler = (e: ChangeEvent<HTMLInputElement>) =>
+    setSearch(e.target.value);
 
   const getAuctionHandler = (auction_num: number) => {
     axios
       .get(`/api/auction/get/${auction_num}`)
       .then((response: AxiosResponse<any, any>) => {
         if (response.status === 200) {
+          setSearch('');
           dispatch(setAuction(response.data));
         } else {
           return;
@@ -44,6 +53,22 @@ const AuctionList = () => {
       .get(`/api/auction/getAuctions/${1}`)
       .then((response: AxiosResponse<any, any>) => {
         if (response.status === 200) {
+          setSearch('');
+          dispatch(setAuctionList(response.data));
+          dispatch(setAuctionListType('all'));
+        } else {
+          return;
+        }
+      });
+  };
+
+  const getAllList = (pageNum: number) => {
+    axios
+      .get(`/api/auction/getAuctions/${pageNum}`)
+      .then((response: AxiosResponse<any, any>) => {
+        if (response.status === 200) {
+          setSearch('');
+          setPageNum(pageNum);
           dispatch(setAuctionList(response.data));
           dispatch(setAuctionListType('all'));
         } else {
@@ -58,10 +83,33 @@ const AuctionList = () => {
       setAlertMessage('로그인 후 이용하실 수 있습니다.');
       return;
     }
+    axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`;
     axios
       .get(`/api/auction/getMyAuctions/${1}`)
       .then((response: AxiosResponse<any, any>) => {
         if (response.status === 200) {
+          setSearch('');
+          dispatch(setAuctionList(response.data));
+          dispatch(setAuctionListType('my'));
+        } else {
+          return;
+        }
+      });
+  };
+
+  const getMyList = (pageNum: number) => {
+    const jwt = cookies.load('authToken');
+    if (!jwt) {
+      setAlertMessage('로그인 후 이용하실 수 있습니다.');
+      return;
+    }
+    axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`;
+    axios
+      .get(`/api/auction/getMyAuctions/${pageNum}`)
+      .then((response: AxiosResponse<any, any>) => {
+        if (response.status === 200) {
+          setSearch('');
+          setPageNum(pageNum);
           dispatch(setAuctionList(response.data));
           dispatch(setAuctionListType('my'));
         } else {
@@ -76,10 +124,12 @@ const AuctionList = () => {
       setAlertMessage('로그인 후 이용하실 수 있습니다.');
       return;
     }
+    axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`;
     axios
       .get(`/api/auction/getBidAuctions/${1}`)
       .then((response: AxiosResponse<any, any>) => {
         if (response.status === 200) {
+          setSearch('');
           dispatch(setAuctionList(response.data));
           dispatch(setAuctionListType('bid'));
         } else {
@@ -88,16 +138,101 @@ const AuctionList = () => {
       });
   };
 
+  const getBidList = (pageNum: number) => {
+    const jwt = cookies.load('authToken');
+    if (!jwt) {
+      setAlertMessage('로그인 후 이용하실 수 있습니다.');
+      return;
+    }
+    axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`;
+    axios
+      .get(`/api/auction/getBidAuctions/${pageNum}`)
+      .then((response: AxiosResponse<any, any>) => {
+        if (response.status === 200) {
+          setSearch('');
+          dispatch(setAuctionList(response.data));
+          dispatch(setAuctionListType('bid'));
+        } else {
+          return;
+        }
+      });
+  };
+
+  const getSearchList = (pageNum: number) => {
+    axios
+      .get(`/api/auction/getSearchAuctions/${pageNum}/${search}`)
+      .then((response: AxiosResponse<any, any>) => {
+        if (response.status === 200) {
+          setPageNum(pageNum);
+          dispatch(setAuctionList(response.data));
+          dispatch(setAuctionListType('my'));
+        } else {
+          return;
+        }
+      });
+  };
+
   useEffect(() => onAllAuctionsHandler(), []);
+
+  const pageChange = (pageNum: number) => {
+    if (auction_list_type === 'all') getAllList(pageNum);
+    else if (auction_list_type === 'my') getMyList(pageNum);
+    else if (auction_list_type === 'bid') getBidList(pageNum);
+    else if (auction_list_type === 'search') getSearchList(pageNum);
+  };
+
+  const page = () => {
+    if (!auction_list.pagination) return;
+    const { hasPrev, prev, min, hasNext, next, max } = auction_list.pagination;
+    const items = [];
+
+    if (hasPrev)
+      items.push(
+        <li className="page-item">
+          <a className="page-link text-dark">
+            <i className="bi bi-caret-left-fill"></i>
+          </a>
+        </li>
+      );
+    for (let p = min; p <= max; p++) {
+      items.push(
+        <li className="page-item">
+          {p == pageNum ? (
+            <a className="page-link text-dark active">{p}</a>
+          ) : (
+            <a className="page-link text-dark">{p}</a>
+          )}
+        </li>
+      );
+    }
+    if (hasNext)
+      items.push(
+        <li className="page-item">
+          <a className="page-link text-dark">
+            <i className="bi bi-caret-right-fill"></i>
+          </a>
+        </li>
+      );
+    return items;
+  };
 
   return (
     <div className="m-1">
       <div className="p-4 card">
         <h3 style={{ marginTop: '10px' }}>경매 목록</h3>
         <div className="input-group mb-3" style={{ marginTop: '35px' }}>
-          <input type="text" className="form-control" placeholder="품명 검색" />
+          <input
+            type="text"
+            className="form-control"
+            placeholder="품명 검색"
+            onChange={onSearchHandler}
+            value={search}
+          />
           <div className="input-group-append">
-            <button className="btn btn-outline-secondary" type="submit">
+            <button
+              className="btn btn-outline-secondary"
+              onClick={() => getSearchList(1)}
+            >
               <i className="bi bi-search"></i>
             </button>
           </div>
@@ -134,55 +269,32 @@ const AuctionList = () => {
                       <span className="badge badge-danger">낙찰</span>
                     )}
                     {!auction.successful_bid_satus && (
-                      <span className="badge badge-success">경매 중</span>
+                      <span className="badge badge-warning">낙찰 전</span>
                     )}
                   </td>
                 </tr>
               ))}
           </tbody>
         </table>
-
         <ul
           className="pagination justify-content-center"
           style={{ margin: '20px 0' }}
         >
-          <li className="page-item">
-            <a className="page-link text-dark" href="javascript:void(0);">
-              <i className="bi bi-caret-left-fill"></i>
-            </a>
-          </li>
-          <li className="page-item">
-            <a className="page-link text-dark" href="javascript:void(0);">
-              1
-            </a>
-          </li>
-          <li className="page-item">
-            <a className="page-link text-dark" href="javascript:void(0);">
-              2
-            </a>
-          </li>
-          <li className="page-item">
-            <a className="page-link text-dark" href="javascript:void(0);">
-              3
-            </a>
-          </li>
-          <li className="page-item">
-            <a className="page-link text-dark" href="javascript:void(0);">
-              4
-            </a>
-          </li>
-          <li className="page-item">
-            <a className="page-link text-dark" href="javascript:void(0);">
-              5
-            </a>
-          </li>
-          <li className="page-item">
-            <a className="page-link text-dark" href="javascript:void(0);">
-              <i className="bi bi-caret-right-fill"></i>
-            </a>
-          </li>
+          {page()}
         </ul>
-        <div className="row" style={{ marginTop: '50px' }}>
+        {alertMessage !== '' && (
+          <div className="alert alert-info">
+            <button
+              type="button"
+              className="close"
+              onClick={() => setAlertMessage('')}
+            >
+              &times;
+            </button>
+            {alertMessage}
+          </div>
+        )}
+        <div className="row" style={{ marginTop: '30px' }}>
           <div className="p-1 col-3">
             <button
               className="btn btn-outline-success btn-block"

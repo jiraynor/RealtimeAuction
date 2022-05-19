@@ -62,7 +62,7 @@ const AuctionItem = () => {
   return (
     <>
       {auction.auction_item ? (
-        <div className="col-8">
+        <div className="col-7">
           <div className="m-1 p-4 card" style={{ height: '430px' }}>
             <h3 className="mb-3">{auction.auction_item.item_name}</h3>
             <div className="row mb-3">
@@ -132,7 +132,7 @@ const AuctionItem = () => {
             </div>
             {!auction.auction_item.auction_status &&
               auction.auction_item.saler.id === cookie_member.id && (
-                <div className="row mb-3">
+                <div className="row mb-3 mt-4">
                   <div className="col-4">
                     <button
                       className="btn btn-outline-danger btn-block"
@@ -186,9 +186,7 @@ const AuctionItem = () => {
           </div>
         </div>
       ) : (
-        <div className="col-8">
-          <div className="m-1 p-4 card" style={{ height: '430px' }}></div>
-        </div>
+        <></>
       )}
     </>
   );
