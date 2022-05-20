@@ -43,10 +43,40 @@ export async function setBid(
   await BidRepository.set(auction, bider, bid_price);
 
   // auction_item.current_price update
-  await AuctionRepository.updateCurrentPrice(auction, bid_price);
+  const auction_item = await AuctionRepository.updateCurrentPrice(
+    auction,
+    bid_price
+  );
 
   const bid_logs = await BidRepository.getBids(auction);
   setBlinds(bid_logs);
 
-  return { status: 200, message: '성공', value: bid_logs };
+  return { status: 200, message: '성공', bid_logs, auction_item };
+}
+
+export async function immediate(auction_num: number, id: string) {
+  // 아이디 가져오기
+  const bider = await MemberRepository.findOneBy({ id });
+  // 상품 가져오기
+  const auction: Auction_item = await AuctionRepository.findOneBy({
+    auction_num,
+  });
+
+  // 본인상품 막기
+  if (id === auction.saler.id)
+    return { status: 400, message: '본인 물건', value: [] };
+
+  // bid_log 넣기
+  await BidRepository.immediate(auction, bider);
+
+  // auction_item.current_price update
+  const auction_item = await AuctionRepository.updateAuctionSuccessful(
+    auction,
+    bider
+  );
+
+  const bid_logs = await BidRepository.getBids(auction);
+  setBlinds(bid_logs);
+
+  return { status: 200, message: '성공', bid_logs, auction_item };
 }

@@ -72,9 +72,6 @@ router.post(
 
       if (id === auction_item.saler.id) res.status(400).send('본인상품');
 
-      console.log(auction_item.auction_status);
-      console.log(auction_item.successful_bid_status);
-
       if (
         auction_item.auction_status === false ||
         auction_item.successful_bid_status === false

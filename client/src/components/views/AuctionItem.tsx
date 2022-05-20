@@ -101,6 +101,10 @@ const AuctionItem = () => {
                 )}{' '}
                 원
               </div>
+              <div className="col-3">현재 금액</div>
+              <div className="col-3">
+                {auction.auction_item.current_price.toLocaleString('ko-KR')} 원
+              </div>
             </div>
             <div className="row mb-3">
               <div className="col-3">등록일</div>
@@ -131,6 +135,7 @@ const AuctionItem = () => {
               </div>
             </div>
             {!auction.auction_item.auction_status &&
+              !auction.auction_item.successful_bid_status &&
               auction.auction_item.saler.id === cookie_member.id && (
                 <div className="row mb-3 mt-4">
                   <div className="col-4">
@@ -178,7 +183,10 @@ const AuctionItem = () => {
                 <div className="row mb-3">
                   <div className="col-3">낙찰날짜</div>
                   <div className="col-3">
-                    {auction.auction_item.successful_bid_datetime}
+                    {auction.auction_item.successful_bid_datetime.substring(
+                      0,
+                      10
+                    )}
                   </div>
                 </div>
               </>

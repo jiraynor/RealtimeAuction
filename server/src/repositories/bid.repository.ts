@@ -22,6 +22,7 @@ export const BidRepository = AppDataSource.getRepository(Bid_log).extend({
       auction,
       bid_price: auction.immediate_sale_price,
       bider,
+      state: true,
     });
 
     return this.save(bid);

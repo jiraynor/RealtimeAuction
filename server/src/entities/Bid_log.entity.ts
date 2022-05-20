@@ -27,4 +27,7 @@ export class Bid_log extends BaseEntity {
 
   @Column({ type: 'datetime', nullable: false, default: () => 'now()' })
   bid_datetime: string;
+
+  @Column({ type: 'boolean', default: false })
+  state: boolean;
 }

@@ -81,9 +81,9 @@ router.get('/get/:auction_number', async (req: Request, res: Response) => {
     const auction_item: Auction_item = await AuctionRepository.findOneBy({
       auction_num,
     });
-    setBlind(auction_item);
 
     const bid_logs: Bid_log[] = await BidRepository.getBids(auction_item);
+    setBlind(auction_item);
 
     res.status(200).json({ auction_item, bid_logs });
   } catch (e) {

@@ -8,5 +8,5 @@ export const setBidLog = (auction: any) => ({
 
 export const removeBidLog = () => ({
   type: REMOVE_BID_LOG,
-  value: { auction_item: undefined },
+  value: { bid_logs: undefined },
 });
