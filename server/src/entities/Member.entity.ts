@@ -39,4 +39,7 @@ export class Member extends BaseEntity {
 
   @OneToMany(() => Auction_item, (auction) => auction.auction_num)
   success_auctions: Auction_item[];
+
+  @Column({ type: 'varchar', length: 225, nullable: true })
+  refreshToken: string;
 }

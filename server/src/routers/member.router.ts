@@ -63,6 +63,10 @@ router.post('/signIn', async (req: Request, res: Response) => {
       expiresIn: 60 * 60 * 1000 * 24,
     }); // 60초 * 15 = 15분
 
+    const refreshToken = jwt.sign({}, jwtSecret, {
+      expiresIn: 60 * 60 * 1000 * 24 * 7,
+    }); // 일주일
+
     res.status(200).json({
       authToken: newUserToken,
       id: member.id,
@@ -156,6 +160,12 @@ router.post('/getBalance', async (req: Request, res: Response) => {
   } catch (e) {
     res.status(503).send('데이터베이스 오류');
   }
+});
+
+// setRefreshToken: RefreshToken 입력
+router.post('/setRefreshToken', async (req: Request, res: Response) => {
+  const id = auth(req.headers.authorization);
+  if (!id) res.status(401).send('권한없음');
 });
 
 export default router;
