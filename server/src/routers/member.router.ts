@@ -16,10 +16,11 @@ router.post('/signUp', async (req: Request, res: Response) => {
   dto.password = await bcrypt.hash(dto.password, 10);
 
   try {
-    const member = await MemberRepository.signUp(dto);
+    const existed = await MemberRepository.findOneBy({ id: dto.id });
+    if (!existed) res.status(422).end('실패');
 
-    console.log(dto.id);
-    // findOneBy(dto.id);
+    await MemberRepository.signUp(dto);
+
     res.status(200).end('성공');
   } catch (e) {
     res.status(422).end('실패');
@@ -48,13 +49,11 @@ router.post('/signIn', async (req: Request, res: Response) => {
   const member: Member = await MemberRepository.findOneBy({ id });
 
   // bcrypt.compare -> 암호화 되어 있는 비밀번호를 복호화 시켜 비켜 해주는 것 반환값 true, false
-  if (member) {
-    const isEqualPw = await bcrypt.compare(password, member.password);
+  if (!member) res.status(406).send('잘못된 로그인 정보');
 
-    if (!isEqualPw) res.status(406).send('잘못된 비밀번호');
-  } else {
-    res.status(406).send('아이디 없음');
-  }
+  const isEqualPw = await bcrypt.compare(password, member.password);
+
+  if (!isEqualPw) res.status(406).send('잘못된 로그인 정보');
 
   try {
     // 로그인 성공
@@ -112,6 +111,8 @@ router.patch('/update', async (req: Request, res: Response) => {
 router.post('/withdrawal', async (req: Request, res: Response) => {
   const { amount } = req.body;
 
+  if (amount < 0) res.status(401).send('잘못된 금액');
+
   const id = auth(req.headers.authorization);
   if (!id) res.status(401).send('권한없음');
 
@@ -132,6 +133,8 @@ router.post('/withdrawal', async (req: Request, res: Response) => {
 // deposit: 입금하기
 router.post('/deposit', async (req: Request, res: Response) => {
   const { amount } = req.body;
+
+  if (amount < 0) res.status(401).send('잘못된 금액');
 
   const id = auth(req.headers.authorization);
   if (!id) res.status(401).send('권한없음');

@@ -47,6 +47,10 @@ const WalletModal = (props: any) => {
       setTransactionMessage('음수 값은 출금 하실수 없습니다.');
       return;
     }
+    if (amount > balance.balance) {
+      setTransactionMessage('소유한 금액보다 큰 금액은 출금 하실수 없습니다.');
+      return;
+    }
     const body = {
       amount,
     };

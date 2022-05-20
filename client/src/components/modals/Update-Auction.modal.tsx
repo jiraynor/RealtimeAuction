@@ -1,7 +1,7 @@
-import { useState, ChangeEvent, KeyboardEvent, MouseEvent } from 'react';
+import { useState, useEffect, ChangeEvent } from 'react';
 import axios, { AxiosResponse } from 'axios';
 import cookies from 'react-cookies';
-import { Modal, Alert } from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { setAuction } from '../../actions/auction.action';
 
@@ -61,6 +61,18 @@ const RegistAuctionModal = (props: any) => {
     setDeadline(e.target.value);
   };
 
+  const close = () => {
+    setItemName('');
+    setItemCategory('');
+    setNumberOfItem(0);
+    setAppraisalValue(0);
+    setLowestSellingPrice(0);
+    setImmadiateSalePrice(0);
+    setItemNote('');
+    setDeadline('');
+    props.onHide();
+  };
+
   const onSubmitHandler = () => {
     if (
       item_name.length === 0 ||
@@ -71,7 +83,30 @@ const RegistAuctionModal = (props: any) => {
       item_note.length === 0 ||
       deadline.length === 0
     ) {
-      setSubmitMessage('최저 매각 금액을 제외한 모든 값은 필수 값입니다.');
+      setSubmitMessage('즉시 매각 금액을 제외한 모든 값은 필수 값입니다.');
+      return;
+    }
+
+    if (
+      number_of_item < 1 ||
+      appraisal_value < 1 ||
+      lowest_selling_price < 1 ||
+      immediate_sale_price < 0
+    ) {
+      setSubmitMessage('갯수 및 금액은 1 이상의 값만 지정할 수 있습니다.');
+      return;
+    }
+
+    if (
+      immediate_sale_price > 0 &&
+      lowest_selling_price >= immediate_sale_price
+    ) {
+      setSubmitMessage('즉시 매각 금액은 최저 매각 금액보다 커야 합니다.');
+      return;
+    }
+
+    if (new Date(deadline) <= new Date()) {
+      setSubmitMessage('마감일은 하루 이상이어야 합니다.');
       return;
     }
 
@@ -95,7 +130,7 @@ const RegistAuctionModal = (props: any) => {
       .then((response: AxiosResponse<any, any>) => {
         if (response.status === 200) {
           dispatch(setAuction(response.data));
-          props.onHide();
+          close();
         }
       })
       .catch((e) => {
@@ -104,6 +139,17 @@ const RegistAuctionModal = (props: any) => {
         }
       });
   };
+
+  useEffect(() => {
+    setItemName(auction.auction_item.item_name);
+    setItemCategory(auction.auction_item.item_category);
+    setNumberOfItem(auction.auction_item.number_of_item);
+    setAppraisalValue(auction.auction_item.appraisal_value);
+    setLowestSellingPrice(auction.auction_item.lowest_selling_price);
+    setImmadiateSalePrice(auction.auction_item.immediate_sale_price);
+    setItemNote(auction.auction_item.item_note);
+    setDeadline(auction.auction_item.deadline.substring(0, 10));
+  }, [auction.auction_item]);
 
   return (
     <Modal {...props} size="lg" centered>

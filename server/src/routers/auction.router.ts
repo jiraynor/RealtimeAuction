@@ -30,11 +30,9 @@ const setBlind = (auction: Auction_item) => {
   auction.saler.bank_code = '********';
 };
 
-const getPageNum = (count: number) => parseInt(count / 10 + '') + 1;
-
 const pagination = (count: number, pageNum: number) => {
   const cnt = parseInt(count / 10 + '') + 1;
-  const section = (pageNum - 1) / 5 + 1;
+  const section = parseInt((pageNum - 1) / 5 + '') + 1;
   const hasNext = cnt > section * 5;
   const next = hasNext ? section * 5 + 1 : 0;
   const max = hasNext ? section * 5 : cnt;
@@ -58,6 +56,31 @@ router.post('/regist', async (req: Request, res: Response) => {
   if (!id) res.status(401).send('권한없음');
 
   try {
+    const {
+      number_of_item,
+      appraisal_value,
+      lowest_selling_price,
+      immediate_sale_price,
+      deadline,
+    } = dto;
+
+    if (
+      number_of_item < 1 ||
+      appraisal_value < 1 ||
+      lowest_selling_price < 1 ||
+      immediate_sale_price < 0
+    )
+      res.status(503).send('0이하의 수 입력 불가');
+
+    if (
+      immediate_sale_price > 0 &&
+      lowest_selling_price >= immediate_sale_price
+    )
+      res.status(503).send('즉시 매각 금액 수치 오류');
+
+    if (new Date(deadline) <= new Date())
+      res.status(503).send('마감일은 하루 이상이어야 합니다.');
+
     const PAGE_NUMBER = 1;
     const member: Member = await MemberRepository.findOneBy({ id });
     await AuctionRepository.regist(dto, member);
@@ -98,6 +121,31 @@ router.patch('/update', async (req: Request, res: Response) => {
   if (!id) res.status(401).send('권한없음');
 
   try {
+    const {
+      number_of_item,
+      appraisal_value,
+      lowest_selling_price,
+      immediate_sale_price,
+      deadline,
+    } = dto;
+
+    if (
+      number_of_item < 1 ||
+      appraisal_value < 1 ||
+      lowest_selling_price < 1 ||
+      immediate_sale_price < 0
+    )
+      res.status(503).send('0이하의 수 입력 불가');
+
+    if (
+      immediate_sale_price > 0 &&
+      lowest_selling_price >= immediate_sale_price
+    )
+      res.status(503).send('즉시 매각 금액 수치 오류');
+
+    if (new Date(deadline) <= new Date())
+      res.status(503).send('마감일은 하루 이상이어야 합니다.');
+
     const auction_num = dto.auction_num;
     const auction = await AuctionRepository.findOneBy({ auction_num });
     if (auction.saler.id !== id) res.status(401).send('권한없음');
@@ -154,7 +202,6 @@ router.delete('/delete/:auction_num', async (req: Request, res: Response) => {
       .status(200)
       .json({ auction_list, pagination: pagination(count, PAGE_NUMBER) });
   } catch (e) {
-    console.log(e.message);
     res.status(503).send('데이터베이스 오류');
   }
 });
@@ -164,17 +211,13 @@ router.get('/getAuctions/:page', async (req: Request, res: Response) => {
 
   try {
     const count = await AuctionRepository.count();
-    console.log('count :', count);
     const auction_list = await AuctionRepository.getPageList(parseInt(page));
-    console.log('auction_list :', auction_list);
     setBlinds(auction_list);
-    console.log('auction_list :', auction_list);
 
     res
       .status(200)
       .json({ auction_list, pagination: pagination(count, parseInt(page)) });
   } catch (e) {
-    console.log(e.message);
     res.status(503).send('데이터베이스 오류');
   }
 });
@@ -185,7 +228,6 @@ router.get(
     const { page, search } = req.params;
 
     try {
-      const PAGE_NUMBER = 1;
       const count = await AuctionRepository.getPageLikeListCount(search);
       const auction_list = await AuctionRepository.getPageLikeList(
         parseInt(page),
@@ -240,7 +282,9 @@ router.get('/getMyAuctions/:page', async (req: Request, res: Response) => {
     );
     setBlinds(auction_list);
 
-    res.status(200).json({ auction_list, page_count: getPageNum(count) });
+    res
+      .status(200)
+      .json({ auction_list, pagination: pagination(count, parseInt(page)) });
   } catch (e) {
     res.status(503).send('데이터베이스 오류');
   }

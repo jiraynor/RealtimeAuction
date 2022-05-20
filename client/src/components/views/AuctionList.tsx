@@ -62,7 +62,7 @@ const AuctionList = () => {
         if (response.status === 200) {
           setSearch('');
           dispatch(setAuctionList(response.data));
-          dispatch(setAuctionListType('all'));
+          dispatch(setAuctionListType({ type: 'all' }));
         } else {
           return;
         }
@@ -77,8 +77,9 @@ const AuctionList = () => {
           setSearch('');
           setPageNum(pageNum);
           dispatch(setAuctionList(response.data));
-          dispatch(setAuctionListType('all'));
+          dispatch(setAuctionListType({ type: 'all' }));
         } else {
+          console.log('error');
           return;
         }
       });
@@ -97,7 +98,7 @@ const AuctionList = () => {
         if (response.status === 200) {
           setSearch('');
           dispatch(setAuctionList(response.data));
-          dispatch(setAuctionListType('my'));
+          dispatch(setAuctionListType({ type: 'my' }));
         } else {
           return;
         }
@@ -118,7 +119,7 @@ const AuctionList = () => {
           setSearch('');
           setPageNum(pageNum);
           dispatch(setAuctionList(response.data));
-          dispatch(setAuctionListType('my'));
+          dispatch(setAuctionListType({ type: 'my' }));
         } else {
           return;
         }
@@ -138,7 +139,7 @@ const AuctionList = () => {
         if (response.status === 200) {
           setSearch('');
           dispatch(setAuctionList(response.data));
-          dispatch(setAuctionListType('bid'));
+          dispatch(setAuctionListType({ type: 'bid' }));
         } else {
           return;
         }
@@ -158,7 +159,7 @@ const AuctionList = () => {
         if (response.status === 200) {
           setSearch('');
           dispatch(setAuctionList(response.data));
-          dispatch(setAuctionListType('bid'));
+          dispatch(setAuctionListType({ type: 'bid' }));
         } else {
           return;
         }
@@ -172,7 +173,7 @@ const AuctionList = () => {
         if (response.status === 200) {
           setPageNum(pageNum);
           dispatch(setAuctionList(response.data));
-          dispatch(setAuctionListType('my'));
+          dispatch(setAuctionListType({ type: 'search' }));
         } else {
           return;
         }
@@ -182,10 +183,12 @@ const AuctionList = () => {
   useEffect(() => onAllAuctionsHandler(), []);
 
   const pageChange = (pageNum: number) => {
-    if (auction_list_type === 'all') getAllList(pageNum);
-    else if (auction_list_type === 'my') getMyList(pageNum);
-    else if (auction_list_type === 'bid') getBidList(pageNum);
-    else if (auction_list_type === 'search') getSearchList(pageNum);
+    console.log(auction_list_type);
+    if (auction_list_type.type === 'all') getAllList(pageNum);
+    else if (auction_list_type.type === 'my') getMyList(pageNum);
+    else if (auction_list_type.type === 'bid') getBidList(pageNum);
+    else if (auction_list_type.type === 'search') getSearchList(pageNum);
+    else getAllList(pageNum);
   };
 
   const page = () => {
@@ -196,7 +199,11 @@ const AuctionList = () => {
     if (hasPrev)
       items.push(
         <li className="page-item">
-          <a className="page-link text-dark">
+          <a
+            className="page-link text-dark"
+            onClick={() => pageChange(prev)}
+            style={{ cursor: 'pointer' }}
+          >
             <i className="bi bi-caret-left-fill"></i>
           </a>
         </li>
@@ -205,9 +212,20 @@ const AuctionList = () => {
       items.push(
         <li className="page-item">
           {p == pageNum ? (
-            <a className="page-link text-dark active">{p}</a>
+            <a
+              className="page-link text-dark active"
+              style={{ cursor: 'default' }}
+            >
+              {p}
+            </a>
           ) : (
-            <a className="page-link text-dark">{p}</a>
+            <a
+              className="page-link text-dark"
+              onClick={() => pageChange(p)}
+              style={{ cursor: 'pointer' }}
+            >
+              {p}
+            </a>
           )}
         </li>
       );
@@ -215,7 +233,11 @@ const AuctionList = () => {
     if (hasNext)
       items.push(
         <li className="page-item">
-          <a className="page-link text-dark">
+          <a
+            className="page-link text-dark"
+            onClick={() => pageChange(next)}
+            style={{ cursor: 'pointer' }}
+          >
             <i className="bi bi-caret-right-fill"></i>
           </a>
         </li>

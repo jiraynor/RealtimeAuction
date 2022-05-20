@@ -89,6 +89,11 @@ const RegistAuctionModal = (props: any) => {
       return;
     }
 
+    if (new Date(deadline) <= new Date()) {
+      setSubmitMessage('마감일은 하루 이상이어야 합니다.');
+      return;
+    }
+
     const body = {
       item_name,
       item_category,
