@@ -228,7 +228,6 @@ router.get('/getMyAuctions/:page', async (req: Request, res: Response) => {
   if (!id) res.status(401).send('권한없음');
 
   try {
-    const PAGE_NUMBER = 1;
     const saler = await MemberRepository.findOneBy({ id });
     const count = await AuctionRepository.getPageSalerListCount(saler);
     const auction_list = await AuctionRepository.getPageSalerList(

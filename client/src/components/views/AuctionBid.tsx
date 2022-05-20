@@ -18,6 +18,7 @@ const AuctionBid = () => {
     const { status, message, bid_logs, auction_item } = data;
     console.log('status :', status);
     console.log('message :', message);
+    console.log('bid_logs :', bid_logs);
     if (status === 200) {
       dispatch(setBidLog({ bid_logs }));
       dispatch(setAuction({ auction_item }));

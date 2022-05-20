@@ -177,7 +177,10 @@ const AuctionItem = () => {
                   </div>
                   <div className="col-3">낙찰 가격</div>
                   <div className="col-3">
-                    {auction.auction_item.successful_bid_price} 원
+                    {auction.auction_item.successful_bid_price.toLocaleString(
+                      'ko-KR'
+                    )}{' '}
+                    원
                   </div>
                 </div>
                 <div className="row mb-3">
