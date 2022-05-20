@@ -7,6 +7,7 @@ import axios, { AxiosResponse } from 'axios';
 import { setAuction } from '../../actions/auction.action';
 import { setAuctionList } from '../../actions/auction-list.action';
 import { setAuctionListType } from '../../actions/auction-list-type.action';
+import { setBidLog } from '../../actions/bid-log.action';
 
 const AuctionList = () => {
   const dispatch = useDispatch();
@@ -15,6 +16,7 @@ const AuctionList = () => {
   const auction_list_type = useSelector(
     (state: any) => state.auction_list_type
   );
+  const socket = useSelector((state: any) => state.auction.socket);
 
   const [registShow, setRegistShow] = useState<boolean>(false);
   const [pageNum, setPageNum] = useState<number>(1);
@@ -32,7 +34,12 @@ const AuctionList = () => {
       .then((response: AxiosResponse<any, any>) => {
         if (response.status === 200) {
           setSearch('');
-          dispatch(setAuction(response.data));
+          if (socket) {
+            socket.disconnect();
+            console.log('disconnect');
+          }
+          dispatch(setAuction({ auction_item: response.data.auction_item }));
+          dispatch(setBidLog({ bid_logs: response.data.bid_logs }));
         } else {
           return;
         }

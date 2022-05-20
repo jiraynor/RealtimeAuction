@@ -93,6 +93,7 @@ router.post(
   }
 );
 
+/*
 // getBids: 입찰 리스트 보기
 router.get(
   '/getBids',
@@ -116,5 +117,5 @@ router.get(
     }
   }
 );
-
+*/
 export default router;

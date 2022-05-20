@@ -28,10 +28,10 @@ export const BidRepository = AppDataSource.getRepository(Bid_log).extend({
   },
 
   // 입찰 리스트 보기
-  async getBids(bider: Member) {
+  async getBids(auction: Auction_item) {
     return this.find({
-      where: { bider },
-      order: { bid_price: 'ASC' },
+      where: { auction },
+      order: { bid_price: 'DESC' },
     });
   },
 });
