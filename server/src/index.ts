@@ -1,6 +1,5 @@
 import express, { Express } from 'express';
 import { bidRouter, memberRouter, auctionRouter } from './routers';
-import { parse } from 'cookie';
 import cookieParser from 'cookie-parser';
 import { Server } from 'socket.io';
 import { immediate, setBid } from './middlewares/bid.middleware';
