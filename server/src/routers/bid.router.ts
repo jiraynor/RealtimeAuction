@@ -17,7 +17,7 @@ const router: Router = Router();
 // set: 입찰
 router.post('/set', async (req: Request, res: Response, next: NextFunction) => {
   // 인증
-  const { auction_num, bid_price } = req.body;
+  let { auction_num, bid_price } = req.body;
   const id = auth(req.headers.authorization);
 
   if (!id) res.status(401).send('권한없음');
@@ -28,10 +28,17 @@ router.post('/set', async (req: Request, res: Response, next: NextFunction) => {
 
     if (
       auction_item.current_price >= bid_price ||
-      auction_item.appraisal_value >= bid_price
+      auction_item.appraisal_value >= bid_price ||
+      bider.balance <= bid_price
     )
       res.status(400).send('금액오류');
 
+    console.log(bid_price);
+    // 입찰할때 즉시 낙찰가 보다 크면 즉시 낙찰가로만 처리
+    if (auction_item.immediate_sale_price >= bid_price)
+      bid_price = auction_item.immediate_sale_price;
+
+    console.log('즉낙보다 큼 : ' + bid_price);
     if (id === auction_item.saler.id) res.status(400).send('본인상품');
 
     await AuctionRepository.updateCurrentPrice(
