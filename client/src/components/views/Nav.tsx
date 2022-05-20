@@ -15,6 +15,7 @@ function Nav() {
 
   const cookie_member = useSelector((state: any) => state.cookie_member);
   const balance = useSelector((state: any) => state.balance);
+  const socket = useSelector((state: any) => state.auction.socket);
 
   const [signUpShow, setSignUpShow] = useState<boolean>(false);
   const [signInShow, setSignInShow] = useState<boolean>(false);
@@ -44,6 +45,10 @@ function Nav() {
 
   const signOutHandler = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+    if (socket) {
+      socket.disconnect();
+      console.log('disconnect');
+    }
     dispatch(setCookieMember({ id: '', name: '' }));
     dispatch(setBalance({ balance: 0 }));
     cookies.save('authToken', '', {

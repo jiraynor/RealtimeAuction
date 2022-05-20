@@ -22,16 +22,17 @@ export const BidRepository = AppDataSource.getRepository(Bid_log).extend({
       auction,
       bid_price: auction.immediate_sale_price,
       bider,
+      state: true,
     });
 
     return this.save(bid);
   },
 
   // 입찰 리스트 보기
-  async getBids(bider: Member) {
+  async getBids(auction: Auction_item) {
     return this.find({
-      where: { bider },
-      order: { bid_price: 'ASC' },
+      where: { auction },
+      order: { bid_price: 'DESC' },
     });
   },
 });

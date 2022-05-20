@@ -1,8 +1,12 @@
 import { Router, Request, Response } from 'express';
 
 import { auth } from '../utils/utility';
-import { MemberRepository, AuctionRepository } from '../repositories';
-import { Auction_item, Member } from '../entities';
+import {
+  MemberRepository,
+  AuctionRepository,
+  BidRepository,
+} from '../repositories';
+import { Auction_item, Bid_log, Member } from '../entities';
 
 const router: Router = Router();
 
@@ -77,9 +81,11 @@ router.get('/get/:auction_number', async (req: Request, res: Response) => {
     const auction_item: Auction_item = await AuctionRepository.findOneBy({
       auction_num,
     });
+
+    const bid_logs: Bid_log[] = await BidRepository.getBids(auction_item);
     setBlind(auction_item);
 
-    res.status(200).json({ auction_item });
+    res.status(200).json({ auction_item, bid_logs });
   } catch (e) {
     res.status(503).send('데이터베이스 오류');
   }

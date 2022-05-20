@@ -1,16 +1,12 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { DataSource, MaxKey } from 'typeorm';
-import { Auction_item } from '../entities/Auction_item.entity';
-import { Member } from '../entities/Member.entity';
-import { Bid_log } from '../entities/Bid_log.entity';
 
 import { auth } from '../utils/utility';
 
-import * as cookieParser from 'cookie-parser';
-import jwt from 'jsonwebtoken';
-import { BidRepository } from '../repositories/bid.repository';
-import { MemberRepository } from '../repositories/member.repository';
-import { AuctionRepository } from '../repositories/auction.repository';
+import {
+  BidRepository,
+  MemberRepository,
+  AuctionRepository,
+} from '../repositories';
 
 const router: Router = Router();
 
@@ -98,11 +94,7 @@ router.get('/getBids', async (req: Request, res: Response) => {
   if (!id) res.status(401).send('권한없음');
 
   try {
-    const bider = await MemberRepository.findOneBy({ id });
-
-    const bidList = await BidRepository.getBids(bider);
-
-    res.status(200).json(bidList);
+    // res.status(200).json(bidList);
   } catch (e) {
     console.error(e.message);
     res.status(503).end('실패');

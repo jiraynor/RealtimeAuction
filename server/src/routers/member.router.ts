@@ -13,11 +13,13 @@ const router: Router = Router();
 router.post('/signUp', async (req: Request, res: Response) => {
   const dto = req.body;
 
-  console.log('라우터 :', dto);
   dto.password = await bcrypt.hash(dto.password, 10);
 
   try {
     const member = await MemberRepository.signUp(dto);
+
+    console.log(dto.id);
+    // findOneBy(dto.id);
     res.status(200).end('성공');
   } catch (e) {
     res.status(422).end('실패');
@@ -46,8 +48,13 @@ router.post('/signIn', async (req: Request, res: Response) => {
   const member: Member = await MemberRepository.findOneBy({ id });
 
   // bcrypt.compare -> 암호화 되어 있는 비밀번호를 복호화 시켜 비켜 해주는 것 반환값 true, false
-  const isEqualPw = await bcrypt.compare(password, member.password);
-  if (!isEqualPw) res.status(406).send('잘못된 비밀번호');
+  if (member) {
+    const isEqualPw = await bcrypt.compare(password, member.password);
+
+    if (!isEqualPw) res.status(406).send('잘못된 비밀번호');
+  } else {
+    res.status(406).send('아이디 없음');
+  }
 
   try {
     // 로그인 성공
