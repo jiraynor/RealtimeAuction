@@ -38,7 +38,6 @@ const AuctionList = () => {
             socket.disconnect();
             console.log('disconnect');
           }
-          console.log(response.data.bid_logs);
           dispatch(setAuction({ auction_item: response.data.auction_item }));
           dispatch(setBidLog({ bid_logs: response.data.bid_logs }));
         } else {
@@ -270,7 +269,10 @@ const AuctionList = () => {
                     {auction.current_price.toLocaleString('ko-KR')} 원
                   </td>
                   <td className="text-center">
-                    {auction.immediate_sale_price.toLocaleString('ko-KR')} 원
+                    {auction.immediate_sale_price !== 0
+                      ? auction.immediate_sale_price.toLocaleString('ko-KR') +
+                        ' 원'
+                      : '없음'}
                   </td>
                   <td className="text-center">
                     {auction.successful_bid_status && (

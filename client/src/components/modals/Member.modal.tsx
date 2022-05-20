@@ -123,148 +123,146 @@ const MemberModal = (props: any) => {
         <Modal.Title>회원정보</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Row className="mb-2">
-          <Col>
-            <h5>아이디 : </h5>
-          </Col>
-          <Col>
-            <h5>{member && member.id}</h5>
-          </Col>
-          <Col>
-            <h5>이름 : </h5>
-          </Col>
-          <Col>
-            <h5>{member && member.name}</h5>
-          </Col>
-        </Row>
-        <Row className="mb-2">
-          <Col>
-            <h5>휴대폰 번호 : </h5>
-          </Col>
-          <Col>
-            <h5>{member && member.tel}</h5>
-          </Col>
-          <Col>
-            <h5>이메일 : </h5>
-          </Col>
-          <Col>
-            <h5>{member && member.email}</h5>
-          </Col>
-        </Row>
-        <Row className="mb-2">
-          <Col>
-            <h5>주소 : </h5>
-          </Col>
-          <Col>
-            <h5>{member && member.address}</h5>
-          </Col>
-        </Row>
-
-        <Row className="mb-2">
-          <Col>
-            <h5>계좌 번호 : </h5>
-          </Col>
-          <Col>
-            <h5>{member && member.account_num}</h5>
-          </Col>
-          <Col>
-            <h5>은행 : </h5>
-          </Col>
-          <Col>
-            <h5>
-              {member && member.bank_code === '003'
-                ? '기업은행'
-                : member && member.bank_code == '004'
-                ? '국민은행'
-                : '농협'}
-            </h5>
-          </Col>
-        </Row>
-        <Row className="mb-2">
-          <button
-            type="button"
-            className="m-1 btn btn-outline-danger"
-            onClick={props.onHide}
-          >
-            취소
-          </button>
-          <button
-            type="button"
-            className="m-1 btn btn-outline-warning"
-            onClick={openUpdate}
-          >
-            수정
-          </button>
-        </Row>
+        <div className="mb-2 row">
+          <div className="col-3 p-2 text-center">아이디 :</div>
+          <div className="col-3 p-2 text-center">{member && member.id}</div>
+          <div className="col-3 p-2 text-center">이름 :</div>
+          <div className="col-3 p-2 text-center">{member && member.name}</div>
+        </div>
+        <div className="mb-2 row">
+          <div className="col-3 p-2 text-center">휴대폰 번호 : </div>
+          <div className="col-3 p-2 text-center">{member && member.tel}</div>
+          <div className="col-3 p-2 text-center">이메일 : </div>
+          <div className="col-3 p-2 text-center">{member && member.email}</div>
+        </div>
+        <div className="mb-2 row">
+          <div className="col-3 p-2 text-center">주소 : </div>
+          <div className="col-9 p-2 text-center">
+            {member && member.address}
+          </div>
+        </div>
+        <div className="mb-2 row">
+          <div className="col-3 p-2 text-center">계좌 번호 : </div>
+          <div className="col-3 p-2 text-center">
+            {member && member.account_num}
+          </div>
+          <div className="col-3 p-2 text-center">은행 : </div>
+          <div className="col-3 p-2 text-center">
+            {member && member.bank_code === '003'
+              ? '기업은행'
+              : member && member.bank_code == '004'
+              ? '국민은행'
+              : '농협'}
+          </div>
+        </div>
+        {!updateShow && (
+          <div className="mt-4 p-2 d-flex flex-row-reverse">
+            <button
+              type="button"
+              className="m-1 btn btn-outline-danger"
+              onClick={props.onHide}
+            >
+              취소
+            </button>
+            <button
+              type="button"
+              className="m-1 btn btn-outline-success"
+              onClick={openUpdate}
+            >
+              수정
+            </button>
+          </div>
+        )}
         {updateShow && (
           <>
             <hr className="mb-2" />
-            <Row className="mb-2">
-              <Col>
-                <Form.Control
+            <div className="p-2 row">
+              <div className="col-2 p-2 text-center">휴대폰 번호 :</div>
+              <div className="col-4 p-2">
+                <input
+                  className="form-control"
                   type="text"
                   placeholder="휴대폰 번호 (- 포함)"
                   value={tel}
                   onChange={onTelHandler}
                   onKeyUp={onCheckTel}
                 />
-              </Col>
-              <Col>
-                <Form.Control
+              </div>
+              <div className="col-2 p-2 text-center">이메일 :</div>
+              <div className="col-4 p-2 text-center">
+                <input
+                  className="form-control"
                   type="email"
-                  placeholder="이메일 주소"
+                  placeholder="이메일"
                   value={email}
                   onChange={onEmailHandler}
                 />
-              </Col>
-            </Row>
-            {telMessage && <Alert variant={'danger'}>{telMessage}</Alert>}
-            <Row className="mb-2">
-              <Col>
-                <Form.Control
+              </div>
+            </div>
+            <div className="p-2 row">
+              <div className="col-2 p-2 text-center">주소 :</div>
+              <div className="col-10 p-2 text-center">
+                <input
+                  className="form-control"
                   type="text"
                   placeholder="주소"
                   value={address}
                   onChange={onAddressHandler}
                 />
-              </Col>
-            </Row>
-            <Row className="mb-2">
-              <Col>
-                <Form.Control
+              </div>
+            </div>
+            {telMessage && <Alert variant={'danger'}>{telMessage}</Alert>}
+            <div className="p-2 row">
+              <div className="col-2 p-2 text-center">계좌 번호 :</div>
+              <div className="col-4 p-2">
+                <input
+                  className="form-control"
                   type="text"
                   placeholder="계좌번호 (숫자만)"
                   value={account_num}
                   onChange={onAccount_numHandler}
                 />
-              </Col>
-              <Col>
+              </div>
+              <div className="col-2 p-2 text-center">은행 :</div>
+              <div className="col-4 p-2">
                 <select className="form-control" onChange={onBank_codeHandler}>
                   <option value="">은행</option>
-                  <option value="003" defaultChecked={bank_code === '003'}>
+                  <option value="003" selected={bank_code === '003'}>
                     기업은행
                   </option>
-                  <option value="004" defaultChecked={bank_code === '004'}>
+                  <option value="004" selected={bank_code === '004'}>
                     국민은행
                   </option>
-                  <option value="011" defaultChecked={bank_code === '011'}>
+                  <option value="011" selected={bank_code === '011'}>
                     농협
                   </option>
                 </select>
-              </Col>
-            </Row>
+              </div>
+            </div>
             {submitMessage && (
               <Alert className="mb-2" variant={'danger'}>
                 {submitMessage}
               </Alert>
             )}
+            <div className="mt-4 p-2 d-flex flex-row-reverse">
+              <button
+                type="button"
+                className="m-1 btn btn-outline-danger"
+                onClick={closeUpdate}
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                className="m-1 btn btn-outline-success"
+                onClick={onSubmitHandler}
+              >
+                수정
+              </button>
+            </div>
           </>
         )}
       </Modal.Body>
-      <Modal.Footer>
-        <Button onClick={closeUpdate}>취소</Button>
-        <Button onClick={onSubmitHandler}>수정</Button>
-      </Modal.Footer>
     </Modal>
   );
 };

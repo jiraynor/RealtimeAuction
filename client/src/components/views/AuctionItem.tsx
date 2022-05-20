@@ -29,10 +29,11 @@ const AuctionItem = () => {
         if (response.status === 200) {
           dispatch(setAuctionList(response.data));
           dispatch(setAuctionListType('all'));
-          dispatch(removeAuction());
+          dispatch(setAuction({ auction_item: { auction_num: 0 } }));
         }
       })
       .catch((e) => {
+        console.log(e.message);
         if (e.response.status === 422) {
           setAlertMessage('등록에 실패했습니다.');
         }
@@ -61,7 +62,7 @@ const AuctionItem = () => {
 
   return (
     <>
-      {auction.auction_item ? (
+      {auction.auction_item.auction_num !== 0 ? (
         <div className="col-7">
           <div className="m-1 p-4 card" style={{ height: '430px' }}>
             <h3 className="mb-3">{auction.auction_item.item_name}</h3>
@@ -96,10 +97,11 @@ const AuctionItem = () => {
             <div className="row mb-3">
               <div className="col-3">즉시 매입 가격</div>
               <div className="col-3">
-                {auction.auction_item.immediate_sale_price.toLocaleString(
-                  'ko-KR'
-                )}{' '}
-                원
+                {auction.auction_item.immediate_sale_price !== 0
+                  ? auction.auction_item.immediate_sale_price.toLocaleString(
+                      'ko-KR'
+                    ) + ' 원'
+                  : '없음'}
               </div>
               <div className="col-3">현재 금액</div>
               <div className="col-3">

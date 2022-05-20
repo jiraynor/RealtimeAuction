@@ -19,7 +19,6 @@ export default function reducer(state = initState, action: any) {
       };
     }
     case REMOVE_AUCTION: {
-      socket.socket.disconnect();
       return {
         ...state,
         ...value,

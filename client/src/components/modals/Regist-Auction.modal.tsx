@@ -67,7 +67,25 @@ const RegistAuctionModal = (props: any) => {
       item_note.length === 0 ||
       deadline.length === 0
     ) {
-      setSubmitMessage('최저 매각 금액을 제외한 모든 값은 필수 값입니다.');
+      setSubmitMessage('즉시 매각 금액을 제외한 모든 값은 필수 값입니다.');
+      return;
+    }
+
+    if (
+      number_of_item < 1 ||
+      appraisal_value < 1 ||
+      lowest_selling_price < 1 ||
+      immediate_sale_price < 0
+    ) {
+      setSubmitMessage('갯수 및 금액은 1 이상의 값만 지정할 수 있습니다.');
+      return;
+    }
+
+    if (
+      immediate_sale_price > 0 &&
+      lowest_selling_price >= immediate_sale_price
+    ) {
+      setSubmitMessage('즉시 매각 금액은 최저 매각 금액보다 커야 합니다.');
       return;
     }
 
@@ -156,7 +174,7 @@ const RegistAuctionModal = (props: any) => {
           </div>
         </div>
         <div className="mb-2 row">
-          <div className="col-2 p-2 text-center">즉시 매입 금액</div>
+          <div className="col-2 p-2 text-center">즉시 매각 금액</div>
           <div className="col-4 p-2">
             <input
               type="number"
@@ -186,6 +204,9 @@ const RegistAuctionModal = (props: any) => {
             />
           </div>
         </div>
+        {submitMessage !== '' && (
+          <div className="alert alert-danger">{submitMessage}</div>
+        )}
       </Modal.Body>
       <Modal.Footer>
         <button

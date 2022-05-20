@@ -1,6 +1,4 @@
 import React, { useState, ChangeEvent, useEffect } from 'react';
-import { io } from 'socket.io-client';
-import cookies from 'react-cookies';
 import { useDispatch, useSelector } from 'react-redux';
 import { setBidLog } from '../../actions/bid-log.action';
 import { setAuction } from '../../actions/auction.action';
@@ -13,15 +11,16 @@ const AuctionBid = () => {
   const bid_logs = useSelector((state: any) => state.bid_log.bid_logs);
 
   const [bid_price, setBid_Price] = useState<number>(0);
+  const [alertMessage, setAlertMessage] = useState<string>('');
 
   socket.on('onBid_logsEvent', (data: any) => {
     const { status, message, bid_logs, auction_item } = data;
-    console.log('status :', status);
-    console.log('message :', message);
-    console.log('bid_logs :', bid_logs);
     if (status === 200) {
       dispatch(setBidLog({ bid_logs }));
       dispatch(setAuction({ auction_item }));
+      setAlertMessage('');
+    } else {
+      setAlertMessage(message);
     }
   });
 
@@ -53,6 +52,7 @@ const AuctionBid = () => {
         </div>
         {auction.auction_item.auction_status &&
           !auction.auction_item.successful_bid_status &&
+          member.id &&
           auction.auction_item.saler.id != member.id && (
             <div className="card-footer">
               <div className="input-group">
@@ -77,6 +77,15 @@ const AuctionBid = () => {
             </div>
           )}
       </div>
+      {alertMessage !== '' && (
+        <div className="toast show ml-1">
+          <div className="toast-header">
+            <strong className="mr-auto text-danger">
+              본인경매에는 입찰할 수 없습니다.
+            </strong>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

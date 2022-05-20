@@ -23,8 +23,6 @@ export const setAuction = (auction: any) => ({
 
 export const removeAuction = () => ({
   type: REMOVE_AUCTION,
-  value: { auction_item: undefined },
-  socket: {
-    socket: undefined,
-  },
+  value: undefined,
+  socket: undefined,
 });
