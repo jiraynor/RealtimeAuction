@@ -36,4 +36,10 @@ export const MemberRepository = AppDataSource.getRepository(Member).extend({
 
     return this.save(member);
   },
+
+  setRefreshToken(member: Member, refreshToken: string) {
+    member.refreshToken = refreshToken;
+
+    return this.save(member);
+  },
 });
