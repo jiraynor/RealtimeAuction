@@ -229,6 +229,7 @@ const SignUpModal = (props: any) => {
               type="text"
               placeholder="아이디"
               onChange={onIdHandler}
+              readOnly={idCheck}
             />
           </Col>
           <Col>
@@ -236,6 +237,7 @@ const SignUpModal = (props: any) => {
               className="btn btn-outline-success btn-block"
               type="button"
               onClick={onCheckIdHandler}
+              disabled={idCheck}
             >
               중복체크
             </button>

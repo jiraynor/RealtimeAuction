@@ -37,6 +37,8 @@ export const AuctionRepository = AppDataSource.getRepository(
   getPageList(page: number) {
     const pageNum = (page - 1) * 10;
 
+    console.log(pageNum);
+
     return this.find({
       skip: pageNum,
       take: 10,

@@ -12,7 +12,7 @@ const AppDataSource = new DataSource({
   password: 'qwer1234',
   database: 'auction',
   entities: [Member, Auction_item, Item_img, Bid_log],
-  synchronize: false,
+  synchronize: true,
   logging: false,
 });
 

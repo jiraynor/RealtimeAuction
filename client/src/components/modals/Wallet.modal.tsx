@@ -20,6 +20,10 @@ const WalletModal = (props: any) => {
   };
 
   const depositHandler = () => {
+    if (amount < 0) {
+      setTransactionMessage('음수 값은 입금 하실수 없습니다.');
+      return;
+    }
     const body = {
       amount,
     };
@@ -39,6 +43,10 @@ const WalletModal = (props: any) => {
   };
 
   const withdrawalHandler = () => {
+    if (amount < 0) {
+      setTransactionMessage('음수 값은 출금 하실수 없습니다.');
+      return;
+    }
     const body = {
       amount,
     };

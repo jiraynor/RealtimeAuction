@@ -7,7 +7,7 @@ export class Member extends BaseEntity {
   @PrimaryColumn()
   id: string;
 
-  @Column({ type: 'varchar', length: 225, nullable: false })
+  @Column({ type: 'varchar', length: 255, nullable: false })
   password: string;
 
   @Column({ type: 'varchar', length: 20, nullable: false })
@@ -40,6 +40,6 @@ export class Member extends BaseEntity {
   @OneToMany(() => Auction_item, (auction) => auction.auction_num)
   success_auctions: Auction_item[];
 
-  @Column({ type: 'varchar', length: 225, nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   refreshToken: string;
 }

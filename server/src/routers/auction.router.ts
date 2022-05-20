@@ -164,13 +164,17 @@ router.get('/getAuctions/:page', async (req: Request, res: Response) => {
 
   try {
     const count = await AuctionRepository.count();
+    console.log('count :', count);
     const auction_list = await AuctionRepository.getPageList(parseInt(page));
+    console.log('auction_list :', auction_list);
     setBlinds(auction_list);
+    console.log('auction_list :', auction_list);
 
     res
       .status(200)
       .json({ auction_list, pagination: pagination(count, parseInt(page)) });
   } catch (e) {
+    console.log(e.message);
     res.status(503).send('데이터베이스 오류');
   }
 });
