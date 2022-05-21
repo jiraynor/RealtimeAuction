@@ -1,5 +1,5 @@
 import express, { Express } from 'express';
-import { memberRouter, auctionRouter } from './routers';
+import { memberRouter, auctionRouter, imgRouter } from './routers';
 import cookieParser from 'cookie-parser';
 import { Server } from 'socket.io';
 import { immediate, setBid } from './middlewares/bid.middleware';
@@ -14,6 +14,7 @@ app.use(cookieParser());
 
 app.use('/api/auction', auctionRouter);
 app.use('/api/member', memberRouter);
+app.use('/api/img', imgRouter);
 
 const server = app.listen(port, () => console.log(`port: ${port} start`));
 

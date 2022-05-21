@@ -106,8 +106,12 @@ router.post(
       const PAGE_NUMBER = 1;
       const member: Member = await MemberRepository.findOneBy({ id });
       const auction = await AuctionRepository.regist(dto, member);
+
       for (let i = 0; i < images.length; i++)
-        await ItemImgRepository.set(images[i].filename, auction);
+        await ItemImgRepository.set(
+          images[i].filename,
+          auction.generatedMaps[0] as Auction_item
+        );
 
       const count = await AuctionRepository.count();
       const auction_list = await AuctionRepository.getPageList(PAGE_NUMBER);
@@ -131,10 +135,12 @@ router.get('/get/:auction_number', async (req: Request, res: Response) => {
       auction_num,
     });
 
+    const item_imgs = await ItemImgRepository.getImgs(auction_item);
+
     const bid_logs: Bid_log[] = await BidRepository.getBids(auction_item);
     setBlind(auction_item);
 
-    return res.status(200).json({ auction_item, bid_logs });
+    return res.status(200).json({ auction_item, bid_logs, item_imgs });
   } catch (e) {
     return res.status(503).send('데이터베이스 오류');
   }

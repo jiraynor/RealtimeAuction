@@ -31,7 +31,7 @@ export const AuctionRepository = AppDataSource.getRepository(
       saler: member,
     });
 
-    return this.save(auction);
+    return this.insert(auction);
   },
 
   getPageList(page: number) {
