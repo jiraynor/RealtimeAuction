@@ -53,7 +53,7 @@ router.post('/regist', async (req: Request, res: Response) => {
   const dto = req.body;
 
   const id = auth(req.headers.authorization);
-  if (!id) res.status(401).send('권한없음');
+  if (!id) return res.status(401).send('권한없음');
 
   try {
     const {
@@ -70,16 +70,16 @@ router.post('/regist', async (req: Request, res: Response) => {
       lowest_selling_price < 1 ||
       immediate_sale_price < 0
     )
-      res.status(503).send('0이하의 수 입력 불가');
+      return res.status(503).send('0이하의 수 입력 불가');
 
     if (
       immediate_sale_price > 0 &&
       lowest_selling_price >= immediate_sale_price
     )
-      res.status(503).send('즉시 매각 금액 수치 오류');
+      return res.status(503).send('즉시 매각 금액 수치 오류');
 
     if (new Date(deadline) <= new Date())
-      res.status(503).send('마감일은 하루 이상이어야 합니다.');
+      return res.status(503).send('마감일은 하루 이상이어야 합니다.');
 
     const PAGE_NUMBER = 1;
     const member: Member = await MemberRepository.findOneBy({ id });
@@ -88,11 +88,11 @@ router.post('/regist', async (req: Request, res: Response) => {
     const auction_list = await AuctionRepository.getPageList(PAGE_NUMBER);
     setBlinds(auction_list);
 
-    res
+    return res
       .status(200)
       .json({ auction_list, pagination: pagination(count, PAGE_NUMBER) });
   } catch (e) {
-    res.status(503).send('데이터베이스 오류');
+    return res.status(503).send('데이터베이스 오류');
   }
 });
 
@@ -108,9 +108,9 @@ router.get('/get/:auction_number', async (req: Request, res: Response) => {
     const bid_logs: Bid_log[] = await BidRepository.getBids(auction_item);
     setBlind(auction_item);
 
-    res.status(200).json({ auction_item, bid_logs });
+    return res.status(200).json({ auction_item, bid_logs });
   } catch (e) {
-    res.status(503).send('데이터베이스 오류');
+    return res.status(503).send('데이터베이스 오류');
   }
 });
 
@@ -118,7 +118,7 @@ router.patch('/update', async (req: Request, res: Response) => {
   const dto = req.body;
 
   const id = auth(req.headers.authorization);
-  if (!id) res.status(401).send('권한없음');
+  if (!id) return res.status(401).send('권한없음');
 
   try {
     const {
@@ -135,7 +135,7 @@ router.patch('/update', async (req: Request, res: Response) => {
       lowest_selling_price < 1 ||
       immediate_sale_price < 0
     )
-      res.status(503).send('0이하의 수 입력 불가');
+      return res.status(503).send('0이하의 수 입력 불가');
 
     if (
       immediate_sale_price > 0 &&
@@ -143,24 +143,23 @@ router.patch('/update', async (req: Request, res: Response) => {
       appraisal_value >= immediate_sale_price &&
       appraisal_value < lowest_selling_price
     )
-      console.log('error');
-    res.status(503).send('즉시 매각 금액 수치 오류');
+      return res.status(503).send('즉시 매각 금액 수치 오류');
 
     if (new Date(deadline) <= new Date())
-      res.status(503).send('마감일은 하루 이상이어야 합니다.');
+      return res.status(503).send('마감일은 하루 이상이어야 합니다.');
 
     const auction_num = dto.auction_num;
     const auction = await AuctionRepository.findOneBy({ auction_num });
-    if (auction.saler.id !== id) res.status(401).send('권한없음');
+    if (auction.saler.id !== id) return res.status(401).send('권한없음');
 
     const member: Member = await MemberRepository.findOneBy({ id });
     await AuctionRepository.updateAuction(dto, member);
     const auction_item = await AuctionRepository.findOneBy({ auction_num });
     setBlind(auction_item);
 
-    res.status(200).json({ auction_item });
+    return res.status(200).json({ auction_item });
   } catch (e) {
-    res.status(503).send('데이터베이스 오류');
+    return res.status(503).send('데이터베이스 오류');
   }
 });
 
@@ -168,19 +167,19 @@ router.patch('/start', async (req: Request, res: Response) => {
   const { auction_num } = req.body;
 
   const id = auth(req.headers.authorization);
-  if (!id) res.status(401).send('권한없음');
+  if (!id) return res.status(401).send('권한없음');
 
   try {
     const auction = await AuctionRepository.findOneBy({ auction_num });
-    if (auction.saler.id !== id) res.status(401).send('권한없음');
+    if (auction.saler.id !== id) return res.status(401).send('권한없음');
 
     await AuctionRepository.startAuction(auction);
     const auction_item = await AuctionRepository.findOneBy({ auction_num });
     setBlind(auction_item);
 
-    res.status(200).json({ auction_item });
+    return res.status(200).json({ auction_item });
   } catch (e) {
-    res.status(503).send('데이터베이스 오류');
+    return res.status(503).send('데이터베이스 오류');
   }
 });
 
@@ -192,7 +191,7 @@ router.delete('/delete/:auction_num', async (req: Request, res: Response) => {
   });
 
   const id = auth(req.headers.authorization);
-  if (!id || auction.saler.id !== id) res.status(401).send('권한없음');
+  if (!id || auction.saler.id !== id) return res.status(401).send('권한없음');
 
   try {
     const PAGE_NUMBER = 1;
@@ -201,11 +200,11 @@ router.delete('/delete/:auction_num', async (req: Request, res: Response) => {
     const auction_list = await AuctionRepository.getPageList(PAGE_NUMBER);
     setBlinds(auction_list);
 
-    res
+    return res
       .status(200)
       .json({ auction_list, pagination: pagination(count, PAGE_NUMBER) });
   } catch (e) {
-    res.status(503).send('데이터베이스 오류');
+    return res.status(503).send('데이터베이스 오류');
   }
 });
 
@@ -217,11 +216,11 @@ router.get('/getAuctions/:page', async (req: Request, res: Response) => {
     const auction_list = await AuctionRepository.getPageList(parseInt(page));
     setBlinds(auction_list);
 
-    res
+    return res
       .status(200)
       .json({ auction_list, pagination: pagination(count, parseInt(page)) });
   } catch (e) {
-    res.status(503).send('데이터베이스 오류');
+    return res.status(503).send('데이터베이스 오류');
   }
 });
 
@@ -238,11 +237,11 @@ router.get(
       );
       setBlinds(auction_list);
 
-      res
+      return res
         .status(200)
         .json({ auction_list, pagination: pagination(count, parseInt(page)) });
     } catch (e) {
-      res.status(503).send('데이터베이스 오류');
+      return res.status(503).send('데이터베이스 오류');
     }
   }
 );
@@ -251,7 +250,7 @@ router.get('/getBidAuctions/:page', async (req: Request, res: Response) => {
   const { page } = req.params;
 
   const id = auth(req.headers.authorization);
-  if (!id) res.status(401).send('권한없음');
+  if (!id) return res.status(401).send('권한없음');
 
   try {
     const saler: Member = await MemberRepository.findOneBy({ id });
@@ -262,11 +261,11 @@ router.get('/getBidAuctions/:page', async (req: Request, res: Response) => {
     );
     setBlinds(auction_list);
 
-    res
+    return res
       .status(200)
       .json({ auction_list, pagination: pagination(count, parseInt(page)) });
   } catch (e) {
-    res.status(503).send('데이터베이스 오류');
+    return res.status(503).send('데이터베이스 오류');
   }
 });
 
@@ -274,7 +273,7 @@ router.get('/getMyAuctions/:page', async (req: Request, res: Response) => {
   const { page } = req.params;
 
   const id = auth(req.headers.authorization);
-  if (!id) res.status(401).send('권한없음');
+  if (!id) return res.status(401).send('권한없음');
 
   try {
     const saler = await MemberRepository.findOneBy({ id });
@@ -285,11 +284,11 @@ router.get('/getMyAuctions/:page', async (req: Request, res: Response) => {
     );
     setBlinds(auction_list);
 
-    res
+    return res
       .status(200)
       .json({ auction_list, pagination: pagination(count, parseInt(page)) });
   } catch (e) {
-    res.status(503).send('데이터베이스 오류');
+    return res.status(503).send('데이터베이스 오류');
   }
 });
 
