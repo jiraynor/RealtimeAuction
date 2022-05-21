@@ -39,7 +39,13 @@ export const MemberRepository = AppDataSource.getRepository(Member).extend({
 
   setRefreshToken(member: Member, refreshToken: string) {
     member.refreshToken = refreshToken;
-
+    console.log('Refresh token 생성 완료');
     return this.save(member);
+  },
+
+  getRefreshToken(id: string, refreshToken: string) {
+    return this.findOne({
+      where: { id, refreshToken },
+    });
   },
 });
