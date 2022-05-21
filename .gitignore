@@ -1,3 +1,2 @@
 **/node_modules
-
-/server/auction_images
+**/auction_images
