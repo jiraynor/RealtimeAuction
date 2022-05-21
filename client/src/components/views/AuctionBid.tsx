@@ -37,7 +37,7 @@ const AuctionBid = () => {
 
   return (
     <div className="col-5">
-      <div className="m-1 p-4 card" style={{ height: '430px' }}>
+      <div className="m-1 p-4 card" style={{ height: '500px' }}>
         <div className="card-body" style={{ overflowX: 'hidden' }}>
           {bid_logs.map((bid: any) => (
             <div

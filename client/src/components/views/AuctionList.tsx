@@ -8,6 +8,7 @@ import { setAuction } from '../../actions/auction.action';
 import { setAuctionList } from '../../actions/auction-list.action';
 import { setAuctionListType } from '../../actions/auction-list-type.action';
 import { setBidLog } from '../../actions/bid-log.action';
+import { setItemImg } from '../../actions/item-img.action';
 
 const AuctionList = () => {
   const dispatch = useDispatch();
@@ -40,6 +41,7 @@ const AuctionList = () => {
           }
           dispatch(setAuction({ auction_item: response.data.auction_item }));
           dispatch(setBidLog({ bid_logs: response.data.bid_logs }));
+          dispatch(setItemImg({ item_imgs: response.data.item_imgs }));
         } else {
           return;
         }

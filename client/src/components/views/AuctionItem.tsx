@@ -6,19 +6,25 @@ import { UpdateAuctionModal } from '../modals';
 import { removeAuction, setAuction } from '../../actions/auction.action';
 import { setAuctionList } from '../../actions/auction-list.action';
 import { setAuctionListType } from '../../actions/auction-list-type.action';
+import ImageModal from '../modals/Item-Image.modal';
 
 const AuctionItem = () => {
   const dispatch = useDispatch();
 
   const auction = useSelector((state: any) => state.auction);
   const cookie_member = useSelector((state: any) => state.cookie_member);
+  const item_imgs = useSelector((state: any) => state.item_img.item_imgs);
 
+  console.log(item_imgs);
   const [updateShow, setUpdateShow] = useState<boolean>(false);
+  const [imageShow, setImageShow] = useState<boolean>(false);
 
   const [alertMessage, setAlertMessage] = useState<string>('');
 
   const updateCloseHandler = () => setUpdateShow(false);
   const updateShowHandler = () => setUpdateShow(true);
+  const imageCloseHandler = () => setImageShow(false);
+  const imageShowHandler = () => setImageShow(true);
 
   const onDeleteHandelr = () => {
     const jwt = cookies.load('authToken');
@@ -64,7 +70,7 @@ const AuctionItem = () => {
     <>
       {auction.auction_item.auction_num !== 0 ? (
         <div className="col-7">
-          <div className="m-1 p-4 card" style={{ height: '430px' }}>
+          <div className="m-1 p-4 card" style={{ height: '500px' }}>
             <h3 className="mb-3">{auction.auction_item.item_name}</h3>
             <div className="row mb-3">
               <div className="col-3">물건번호</div>
@@ -135,6 +141,21 @@ const AuctionItem = () => {
                   <span className="badge badge-warning">낙찰 전</span>
                 )}
               </div>
+            </div>
+            <div className="row mt-2 mb-1">
+              {item_imgs.length !== 0 && (
+                <>
+                  <div className="col-12">
+                    <button
+                      className="btn btn-outline-info btn-block"
+                      onClick={imageShowHandler}
+                    >
+                      이미지 보기
+                    </button>
+                  </div>
+                  <ImageModal show={imageShow} onHide={imageCloseHandler} />
+                </>
+              )}
             </div>
             {!auction.auction_item.auction_status &&
               !auction.auction_item.successful_bid_status &&

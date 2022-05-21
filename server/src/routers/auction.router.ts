@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import multer from 'multer';
 import path from 'path';
+import fs from 'fs';
 
 import { auth } from '../utils/utility';
 import {
@@ -10,6 +11,7 @@ import {
   ItemImgRepository,
 } from '../repositories';
 import { Auction_item, Bid_log, Member } from '../entities';
+import { FindOptionsWhere } from 'typeorm';
 
 const router: Router = Router();
 
@@ -71,8 +73,6 @@ router.post(
   async (req: Request, res: Response) => {
     const dto = req.body;
     const images = req.files;
-
-    // console.log(images[0].filename);
 
     const id = auth(req.headers.authorization);
     if (!id) return res.status(401).send('권한없음');
@@ -226,6 +226,32 @@ router.delete('/delete/:auction_num', async (req: Request, res: Response) => {
 
   try {
     const PAGE_NUMBER = 1;
+    const imgs = await ItemImgRepository.findBy({
+      auction_item: auction as FindOptionsWhere<Auction_item>,
+    });
+
+    for (let item_img of imgs) {
+      if (
+        !fs.existsSync(
+          path.join(path.resolve('server/auction_images'), item_img.img)
+        )
+      )
+        return res.status(400);
+
+      fs.unlink(
+        path.join('server/auction_images', item_img.img),
+        function (err) {
+          if (err) {
+            console.log('Error : ', err);
+            return res.status(400);
+          }
+        }
+      );
+    }
+
+    await ItemImgRepository.delete({
+      auction_item: auction as FindOptionsWhere<Auction_item>,
+    });
     await AuctionRepository.delete({ auction_num: parseInt(auction_num) });
     const count = await AuctionRepository.count();
     const auction_list = await AuctionRepository.getPageList(PAGE_NUMBER);
