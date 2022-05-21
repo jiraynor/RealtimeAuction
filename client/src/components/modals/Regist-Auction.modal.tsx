@@ -16,6 +16,7 @@ const RegistAuctionModal = (props: any) => {
   const [immediate_sale_price, setImmadiateSalePrice] = useState<number>(0);
   const [item_note, setItemNote] = useState<string>('');
   const [deadline, setDeadline] = useState<string>('');
+  const [images, setImages] = useState<any[]>([]);
 
   const [submitMessage, setSubmitMessage] = useState<string>('');
 
@@ -43,6 +44,39 @@ const RegistAuctionModal = (props: any) => {
   const onDeadlineHandler = (e: ChangeEvent<HTMLInputElement>) => {
     setDeadline(e.target.value);
   };
+  const onImageHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+
+    const fileVal = e.target.files;
+    if (fileVal) {
+      const file_name = fileVal[0].name;
+      const file_extension = file_name
+        .substring(file_name.lastIndexOf('.') + 1)
+        .toLowerCase();
+
+      if (file_extension !== 'png' && file_extension !== 'jpg') {
+        setSubmitMessage('png 또는 jpg 이미지만 추가할 수 있습니다.');
+        return;
+      }
+
+      if (fileVal[0].size > 10 * 1024 * 1024) {
+        setSubmitMessage('10MB를 초과하는 이미지는 추가하실수 없습니다.');
+        return;
+      }
+
+      const setter = [];
+      for (let i of images) setter.push(i);
+
+      setter.push(fileVal[0]);
+      setImages(setter);
+    }
+  };
+
+  const removeImage = (index: number) => {
+    const setter = [];
+    for (let i = 0; i < images.length; i++) if (index !== i) setter.push(i);
+    setImages(setter);
+  };
 
   const close = () => {
     setItemName('');
@@ -54,6 +88,7 @@ const RegistAuctionModal = (props: any) => {
     setImmadiateSalePrice(0);
     setItemNote('');
     setDeadline('');
+    setImages([]);
     props.onHide();
   };
 
@@ -208,6 +243,39 @@ const RegistAuctionModal = (props: any) => {
               onChange={onItemNoteHandler}
             />
           </div>
+        </div>
+        <div className="mb-2 row">
+          <div className="col-12 p-2 text-center">물건 설명</div>
+        </div>
+        <div className="mb-2 row">
+          <div className="col-12 pl-4 pr-4">
+            <label className="btn btn-outline-secondary">
+              이미지 추가{' '}
+              <input
+                type="file"
+                style={{ display: 'none' }}
+                onChange={onImageHandler}
+              />
+            </label>
+          </div>
+        </div>
+        <div className="mb-2 row pl-3 pr-3">
+          {images &&
+            images.map((image, index) => (
+              <div
+                key={image.index}
+                className="alert alert-secondary alert-dismissible m-1"
+              >
+                <button
+                  type="button"
+                  className="close"
+                  onClick={() => removeImage(index)}
+                >
+                  &times;
+                </button>
+                <strong>{image.name}</strong>
+              </div>
+            ))}
         </div>
         {submitMessage !== '' && (
           <div className="alert alert-danger">{submitMessage}</div>

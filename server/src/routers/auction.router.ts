@@ -159,6 +159,7 @@ router.patch('/update', async (req: Request, res: Response) => {
 
     return res.status(200).json({ auction_item });
   } catch (e) {
+    console.log(e.message);
     return res.status(503).send('데이터베이스 오류');
   }
 });
