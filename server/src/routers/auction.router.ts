@@ -1,14 +1,30 @@
 import { Router, Request, Response } from 'express';
+import multer from 'multer';
+import path from 'path';
 
 import { auth } from '../utils/utility';
 import {
   MemberRepository,
   AuctionRepository,
   BidRepository,
+  ItemImgRepository,
 } from '../repositories';
 import { Auction_item, Bid_log, Member } from '../entities';
 
 const router: Router = Router();
+
+const upload = multer({
+  storage: multer.diskStorage({
+    destination(req, file, cb) {
+      cb(null, 'server/auction_images/');
+    },
+    filename(req, file, cb) {
+      const ext = path.extname(file.originalname);
+      cb(null, Date.now() + ext);
+    },
+  }),
+  limits: { fileSize: 10 * 1024 * 1024 },
+});
 
 const setBlinds = (auction_list: Auction_item[]) => {
   for (let auction of auction_list) {
@@ -49,52 +65,62 @@ const pagination = (count: number, pageNum: number) => {
   };
 };
 
-router.post('/regist', async (req: Request, res: Response) => {
-  const dto = req.body;
+router.post(
+  '/regist',
+  upload.array('images'),
+  async (req: Request, res: Response) => {
+    const dto = req.body;
+    const images = req.files;
 
-  const id = auth(req.headers.authorization);
-  if (!id) return res.status(401).send('권한없음');
+    // console.log(images[0].filename);
 
-  try {
-    const {
-      number_of_item,
-      appraisal_value,
-      lowest_selling_price,
-      immediate_sale_price,
-      deadline,
-    } = dto;
+    const id = auth(req.headers.authorization);
+    if (!id) return res.status(401).send('권한없음');
 
-    if (
-      number_of_item < 1 ||
-      appraisal_value < 1 ||
-      lowest_selling_price < 1 ||
-      immediate_sale_price < 0
-    )
-      return res.status(503).send('0이하의 수 입력 불가');
+    try {
+      const {
+        number_of_item,
+        appraisal_value,
+        lowest_selling_price,
+        immediate_sale_price,
+        deadline,
+      } = dto;
 
-    if (
-      immediate_sale_price > 0 &&
-      lowest_selling_price >= immediate_sale_price
-    )
-      return res.status(503).send('즉시 매각 금액 수치 오류');
+      if (
+        number_of_item < 1 ||
+        appraisal_value < 1 ||
+        lowest_selling_price < 1 ||
+        immediate_sale_price < 0
+      )
+        return res.status(503).send('0이하의 수 입력 불가');
 
-    if (new Date(deadline) <= new Date())
-      return res.status(503).send('마감일은 하루 이상이어야 합니다.');
+      if (
+        immediate_sale_price > 0 &&
+        lowest_selling_price >= immediate_sale_price
+      )
+        return res.status(503).send('즉시 매각 금액 수치 오류');
 
-    const PAGE_NUMBER = 1;
-    const member: Member = await MemberRepository.findOneBy({ id });
-    await AuctionRepository.regist(dto, member);
-    const count = await AuctionRepository.count();
-    const auction_list = await AuctionRepository.getPageList(PAGE_NUMBER);
-    setBlinds(auction_list);
+      if (new Date(deadline) <= new Date())
+        return res.status(503).send('마감일은 하루 이상이어야 합니다.');
 
-    return res
-      .status(200)
-      .json({ auction_list, pagination: pagination(count, PAGE_NUMBER) });
-  } catch (e) {
-    return res.status(503).send('데이터베이스 오류');
+      const PAGE_NUMBER = 1;
+      const member: Member = await MemberRepository.findOneBy({ id });
+      const auction = await AuctionRepository.regist(dto, member);
+      for (let i = 0; i < images.length; i++)
+        await ItemImgRepository.set(images[i].filename, auction);
+
+      const count = await AuctionRepository.count();
+      const auction_list = await AuctionRepository.getPageList(PAGE_NUMBER);
+      setBlinds(auction_list);
+
+      return res
+        .status(200)
+        .json({ auction_list, pagination: pagination(count, PAGE_NUMBER) });
+    } catch (e) {
+      return res.status(503).send('데이터베이스 오류');
+    }
   }
-});
+);
 
 router.get('/get/:auction_number', async (req: Request, res: Response) => {
   const { auction_number } = req.params;

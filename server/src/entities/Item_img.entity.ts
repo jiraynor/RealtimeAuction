@@ -21,5 +21,5 @@ export class Item_img extends BaseEntity {
   @ManyToOne(() => Auction_item, (Auction_item) => Auction_item.auction_num, {
     eager: true,
   })
-  auction_num: number;
+  auction_item: Auction_item;
 }
