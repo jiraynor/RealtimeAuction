@@ -35,10 +35,10 @@ router.get('/checkId/:id', async (req: Request, res: Response) => {
 
   if (member) {
     // 존재하는 아이디
-    res.status(406).end('중복');
+    return res.status(406).end('중복');
   } else {
     // 존재하지 않는 아이디
-    res.status(200).end('중복 아님');
+    return res.status(200).end('중복 아님');
   }
 });
 
@@ -56,7 +56,7 @@ router.post(
 
     const isEqualPw = await bcrypt.compare(password, member.password);
 
-    if (!isEqualPw) res.status(406).send('잘못된 로그인 정보');
+    if (!isEqualPw) return res.status(406).send('잘못된 로그인 정보');
 
     try {
       // 로그인 성공
@@ -69,14 +69,14 @@ router.post(
         expiresIn: 60 * 60 * 1000 * 24 * 7,
       }); // 일주일
 
-      res.status(200).json({
+      return res.status(200).json({
         authToken: newUserToken,
         id: member.id,
         name: member.name,
         balance: member.balance,
       });
     } catch (e) {
-      res.status(503).send('토큰 생성 오류');
+      return res.status(503).send('토큰 생성 오류');
     }
   }
 );
@@ -84,15 +84,15 @@ router.post(
 // get: 회원 정보 불러오기
 router.get('/get', async (req: Request, res: Response) => {
   const id = auth(req.headers.authorization);
-  if (!id) res.status(401).send('권한없음');
+  if (!id) return res.status(401).send('권한없음');
 
   try {
     const member: Member = await MemberRepository.findOneBy({ id });
 
     member.password = '********';
-    res.status(200).json(member);
+    return res.status(200).json(member);
   } catch (e) {
-    res.status(503).send('데이터베이스 오류');
+    return res.status(503).send('데이터베이스 오류');
   }
 });
 
@@ -101,13 +101,13 @@ router.patch('/update', async (req: Request, res: Response) => {
   const dto = req.body;
 
   const id = auth(req.headers.authorization);
-  if (!id) res.status(401).send('권한없음');
+  if (!id) return res.status(401).send('권한없음');
 
   try {
     const member: Member = await MemberRepository.updateMember(dto);
-    res.status(200).json(member);
+    return res.status(200).json(member);
   } catch (e) {
-    res.status(503).send('데이터베이스 오류');
+    return res.status(503).send('데이터베이스 오류');
   }
 });
 
@@ -115,22 +115,22 @@ router.patch('/update', async (req: Request, res: Response) => {
 router.post('/withdrawal', async (req: Request, res: Response) => {
   const { amount } = req.body;
 
-  if (amount < 0) res.status(401).send('잘못된 금액');
+  if (amount < 0) return res.status(401).send('잘못된 금액');
 
   const id = auth(req.headers.authorization);
-  if (!id) res.status(401).send('권한없음');
+  if (!id) return res.status(401).send('권한없음');
 
   try {
     const member: Member = await MemberRepository.findOneBy({ id });
 
-    if (member.balance < amount) res.status(412).send('잔액 부족');
+    if (member.balance < amount) return res.status(412).send('잔액 부족');
 
     member.balance -= amount;
     await MemberRepository.save(member);
 
-    res.status(200).json({ balance: member.balance });
+    return res.status(200).json({ balance: member.balance });
   } catch (e) {
-    res.status(503).send('데이터베이스 오류');
+    return res.status(503).send('데이터베이스 오류');
   }
 });
 
@@ -138,10 +138,10 @@ router.post('/withdrawal', async (req: Request, res: Response) => {
 router.post('/deposit', async (req: Request, res: Response) => {
   const { amount } = req.body;
 
-  if (amount < 0) res.status(401).send('잘못된 금액');
+  if (amount < 0) return res.status(401).send('잘못된 금액');
 
   const id = auth(req.headers.authorization);
-  if (!id) res.status(401).send('권한없음');
+  if (!id) return res.status(401).send('권한없음');
 
   try {
     const member: Member = await MemberRepository.findOneBy({ id });
@@ -149,30 +149,30 @@ router.post('/deposit', async (req: Request, res: Response) => {
 
     await MemberRepository.save(member);
 
-    res.status(200).json({ balance: member.balance });
+    return res.status(200).json({ balance: member.balance });
   } catch (e) {
-    res.status(503).send('데이터베이스 오류');
+    return res.status(503).send('데이터베이스 오류');
   }
 });
 
 // getBalance: 유저 잔액 가져오기
 router.post('/getBalance', async (req: Request, res: Response) => {
   const id = auth(req.headers.authorization);
-  if (!id) res.status(401).send('권한없음');
+  if (!id) return res.status(401).send('권한없음');
 
   try {
     const member: Member = await MemberRepository.findOneBy({ id });
 
-    res.status(200).json({ balance: member.balance });
+    return res.status(200).json({ balance: member.balance });
   } catch (e) {
-    res.status(503).send('데이터베이스 오류');
+    return res.status(503).send('데이터베이스 오류');
   }
 });
 
 // setRefreshToken: RefreshToken 입력
 router.post('/setRefreshToken', async (req: Request, res: Response) => {
   const id = auth(req.headers.authorization);
-  if (!id) res.status(401).send('권한없음');
+  if (!id) return res.status(401).send('권한없음');
 });
 
 export default router;
