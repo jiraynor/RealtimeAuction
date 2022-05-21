@@ -6,6 +6,8 @@ import * as bcrypt from 'bcryptjs';
 import { auth } from '../utils/utility';
 import { MemberRepository } from '../repositories';
 import { Member } from '../entities';
+import { setCookieMember } from 'client/src/actions/cookie-member.action';
+import cookieParser, { CookieParseOptions } from 'cookie-parser';
 
 const router: Router = Router();
 
@@ -61,7 +63,7 @@ router.post(
     try {
       // 로그인 성공
       const jwtSecret = 'JsonWebTokenSecret';
-      const newUserToken = jwt.sign({ id }, jwtSecret, {
+      const accessToken = jwt.sign({ id }, jwtSecret, {
         expiresIn: 60 * 60 * 1000 * 24,
       }); // 60초 * 15 = 15분
 
@@ -69,8 +71,11 @@ router.post(
         expiresIn: 60 * 60 * 1000 * 24 * 7,
       }); // 일주일
 
-      return res.status(200).json({
-        authToken: newUserToken,
+      // DB에 Refresh 토큰 저장
+      MemberRepository.setRefreshToken(member, refreshToken);
+
+      return res.status(200).cookie('refreshToken', refreshToken).json({
+        authToken: accessToken,
         id: member.id,
         name: member.name,
         balance: member.balance,
@@ -84,10 +89,22 @@ router.post(
 // get: 회원 정보 불러오기
 router.get('/get', async (req: Request, res: Response) => {
   const id = auth(req.headers.authorization);
+  const { refreshToken } = req.cookies;
+
   if (!id) return res.status(401).send('권한없음');
 
+  console.log(id);
+  console.log(refreshToken);
+
+  const member: Member = await MemberRepository.getRefreshToken(
+    id,
+    refreshToken
+  );
+
+  console.log(member);
+
   try {
-    const member: Member = await MemberRepository.findOneBy({ id });
+    // const member: Member = await MemberRepository.findOneBy({ id });
 
     member.password = '********';
     return res.status(200).json(member);

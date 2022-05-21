@@ -139,9 +139,7 @@ router.patch('/update', async (req: Request, res: Response) => {
 
     if (
       immediate_sale_price > 0 &&
-      lowest_selling_price >= immediate_sale_price &&
-      appraisal_value >= immediate_sale_price &&
-      appraisal_value < lowest_selling_price
+      lowest_selling_price >= immediate_sale_price
     )
       return res.status(503).send('즉시 매각 금액 수치 오류');
 

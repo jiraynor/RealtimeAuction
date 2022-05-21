@@ -17,6 +17,19 @@ export const auth = (authorization: string) => {
   }
 };
 
+export const refreshToken = (id: string, refreshToken1: string) => {
+  try {
+    const token = MemberRepository.getRefreshToken(id, refreshToken1);
+    const jwtSecret = 'JsonWebTokenSecret';
+    const refreshToken = jwt.verify(token, jwtSecret);
+
+    return refreshToken;
+  } catch (e) {
+    console.error(e.message);
+    return '';
+  }
+};
+
 export const socketAuth = (token: string) => {
   try {
     const jwtSecret = 'JsonWebTokenSecret';
