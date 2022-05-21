@@ -1,5 +1,5 @@
 import express, { Express } from 'express';
-import { bidRouter, memberRouter, auctionRouter } from './routers';
+import { memberRouter, auctionRouter } from './routers';
 import cookieParser from 'cookie-parser';
 import { Server } from 'socket.io';
 import { immediate, setBid } from './middlewares/bid.middleware';
@@ -12,7 +12,6 @@ const app: Express = express(),
 app.use(express.json());
 app.use(cookieParser());
 
-app.use('/api/bid', bidRouter);
 app.use('/api/auction', auctionRouter);
 app.use('/api/member', memberRouter);
 
