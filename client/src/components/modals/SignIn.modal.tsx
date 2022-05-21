@@ -1,13 +1,16 @@
 import { useState, MouseEvent, ChangeEvent } from 'react';
 import { Button, Modal, Form, Row, Col, Alert } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import axios, { AxiosResponse } from 'axios';
 import cookies from 'react-cookies';
 import { setCookieMember } from '../../actions/cookie-member.action';
 import { setBalance } from '../../actions/balance.action';
+import { setSocket } from '../../actions/auction.action';
 
 const SignInModal = (props: any) => {
   const dispatch = useDispatch();
+  const socket = useSelector((state: any) => state.auction.socket);
+  const auction = useSelector((state: any) => state.auction.auction_item);
 
   const [id, setId] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -49,6 +52,7 @@ const SignInModal = (props: any) => {
         if (response.status === 200) {
           const { authToken, id, name, balance } = response.data;
           const member = { id, name };
+          if (socket) socket.disconnect();
 
           dispatch(setCookieMember(member));
           dispatch(setBalance({ balance: parseInt(balance) }));
@@ -65,6 +69,8 @@ const SignInModal = (props: any) => {
             path: '/',
             expires,
           });
+
+          if (auction) dispatch(setSocket(auction.auction_num));
 
           close();
         }

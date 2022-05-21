@@ -29,6 +29,8 @@ io.on('connection', (socket) => {
   const { auction_num } = socket.handshake.query;
   const { Bearer } = socket.handshake.auth;
 
+  console.log('auction_num :', auction_num);
+
   if (Bearer === undefined) socket.disconnect(true);
   // auction_num 에 따른 room으로 이동
 

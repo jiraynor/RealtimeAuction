@@ -1,6 +1,8 @@
-import { io } from 'socket.io-client';
-
-import { SET_AUCTION, REMOVE_AUCTION } from '../actions/auction.action';
+import {
+  SET_AUCTION,
+  REMOVE_AUCTION,
+  SET_SOCKET,
+} from '../actions/auction.action';
 
 const initState = {
   value: undefined,
@@ -19,6 +21,13 @@ export default function reducer(state = initState, action: any) {
       };
     }
     case REMOVE_AUCTION: {
+      return {
+        ...state,
+        ...value,
+        ...socket,
+      };
+    }
+    case SET_SOCKET: {
       return {
         ...state,
         ...value,

@@ -248,6 +248,9 @@ const RegistAuctionModal = (props: any) => {
             />
           </div>
         </div>
+        {submitMessage !== '' && (
+          <div className="alert alert-danger">{submitMessage}</div>
+        )}
       </Modal.Body>
       <Modal.Footer>
         <button
