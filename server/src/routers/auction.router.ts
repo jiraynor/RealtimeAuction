@@ -139,9 +139,12 @@ router.patch('/update', async (req: Request, res: Response) => {
 
     if (
       immediate_sale_price > 0 &&
-      lowest_selling_price >= immediate_sale_price
+      lowest_selling_price >= immediate_sale_price &&
+      appraisal_value >= immediate_sale_price &&
+      appraisal_value < lowest_selling_price
     )
-      res.status(503).send('즉시 매각 금액 수치 오류');
+      console.log('error');
+    res.status(503).send('즉시 매각 금액 수치 오류');
 
     if (new Date(deadline) <= new Date())
       res.status(503).send('마감일은 하루 이상이어야 합니다.');
