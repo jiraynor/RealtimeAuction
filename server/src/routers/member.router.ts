@@ -21,13 +21,19 @@ router.post('/signUp', async (req: Request, res: Response) => {
 
   try {
     const existed = await MemberRepository.findOneBy({ id: dto.id });
-    if (existed) return res.status(422).json({});
+    // 존재하는 아이디
+    if (existed)
+      return res.status(422).json({ state: false, message: 'Existed ID' });
 
     await MemberRepository.signUp(dto);
 
-    return res.status(200).json({});
+    // 사용가능한 아이디
+    return res
+      .status(200)
+      .json({ state: true, message: 'Successfully registered as a member' });
   } catch (e) {
-    return res.status(422).json({});
+    // 데이터베이스 오류
+    return res.status(503).json({ state: false, message: 'Database Error' });
   }
 });
 
@@ -39,10 +45,10 @@ router.get('/checkId/:id', async (req: Request, res: Response) => {
 
   if (member) {
     // 존재하는 아이디
-    return res.status(406).json({});
+    return res.status(205).json({ state: false, message: 'Existed ID' });
   } else {
     // 존재하지 않는 아이디
-    return res.status(200).json({});
+    return res.status(200).json({ state: true, message: 'Available ID' });
   }
 });
 
@@ -56,11 +62,19 @@ router.post(
 
     // bcrypt.compare -> 암호화 되어 있는 비밀번호를 복호화 시켜 비켜 해주는 것 반환값 true, false
 
-    if (!member) return res.status(406).json({});
+    // 아이디 불일치
+    if (!member)
+      return res
+        .status(401)
+        .json({ state: false, message: 'Sign in information does not match.' });
 
     const isEqualPw = await bcrypt.compare(password, member.password);
 
-    if (!isEqualPw) return res.status(406).json({});
+    // 비밀번호 불일치
+    if (!isEqualPw)
+      return res
+        .status(401)
+        .json({ state: false, message: 'Sign in information does not match.' });
 
     try {
       // 로그인 성공
@@ -71,6 +85,7 @@ router.post(
       MemberRepository.setRefreshToken(member, refreshToken);
 
       return res.status(200).json({
+        state: true,
         authToken: accessToken,
         refreshToken,
         id: member.id,
@@ -78,7 +93,7 @@ router.post(
         balance: member.balance,
       });
     } catch (e) {
-      return res.status(503).json({});
+      return res.status(503).json({ state: false, message: 'Database Error.' });
     }
   }
 );
@@ -100,7 +115,7 @@ router.get('/get', async (req: Request, res: Response) => {
     member.password = '********';
     return res.status(200).json(member);
   } catch (e) {
-    return res.status(503).send('데이터베이스 오류');
+    return res.status(503).send('Database Error.');
   }
 });
 
@@ -157,7 +172,7 @@ router.post('/withdrawal', async (req: Request, res: Response) => {
 router.post('/deposit', async (req: Request, res: Response) => {
   const { amount } = req.body;
 
-  if (amount < 0) return res.status(401).send('잘못된 금액');
+  if (amount < 0) return res.status(401).json({});
 
   const id = authAccessToken(req.headers.authorization);
   // 빈 토큰
