@@ -50,7 +50,7 @@ const SignInModal = (props: any) => {
       .post(`/api/member/signIn`, body)
       .then((response: AxiosResponse<any, any>) => {
         if (response.status === 200) {
-          const { authToken, id, name, balance } = response.data;
+          const { authToken, id, name, balance, refreshToke } = response.data;
           const member = { id, name };
           if (socket) socket.disconnect();
 
@@ -58,7 +58,7 @@ const SignInModal = (props: any) => {
           dispatch(setBalance({ balance: parseInt(balance) }));
 
           const expires = new Date();
-          expires.setHours(expires.getHours() + 1);
+          expires.setMinutes(expires.getMinutes() + 1);
           cookies.save('authToken', authToken, {
             path: '/',
             secure: true,
@@ -66,6 +66,11 @@ const SignInModal = (props: any) => {
           });
 
           cookies.save('member', member, {
+            path: '/',
+            expires,
+          });
+
+          cookies.save('refreshToke', refreshToke, {
             path: '/',
             expires,
           });

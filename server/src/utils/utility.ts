@@ -6,7 +6,7 @@ export const _REFRESH_ = 'rtas"refresh';
 // accessToken 생성
 export const setAccessToken = (id: string) =>
   jwt.sign({ id }, _AUTH_, {
-    expiresIn: '1d',
+    expiresIn: '1m',
   });
 
 // refreshToken 생성
