@@ -7,6 +7,7 @@ import { removeAuction, setAuction } from '../../actions/auction.action';
 import { setAuctionList } from '../../actions/auction-list.action';
 import { setAuctionListType } from '../../actions/auction-list-type.action';
 import ImageModal from '../modals/Item-Image.modal';
+import { getRefreshToken } from '../../reducers/refresh-token.reducer';
 
 const AuctionItem = () => {
   const dispatch = useDispatch();
@@ -39,10 +40,9 @@ const AuctionItem = () => {
         }
       })
       .catch((e) => {
-        console.log(e.message);
-        if (e.response.status === 422) {
-          setAlertMessage('등록에 실패했습니다.');
-        }
+        if (e.response.status === 422)
+          setAlertMessage(getRefreshToken(cookie_member.id) + '');
+        else setAlertMessage('삭제에 실패했습니다.');
       });
   };
 
@@ -60,9 +60,9 @@ const AuctionItem = () => {
         }
       })
       .catch((e) => {
-        if (e.response.status === 422) {
-          setAlertMessage('등록에 실패했습니다.');
-        }
+        if (e.response.status === 422)
+          setAlertMessage(getRefreshToken(cookie_member.id) + '');
+        else setAlertMessage('경매 시작에 실패했습니다.');
       });
   };
 

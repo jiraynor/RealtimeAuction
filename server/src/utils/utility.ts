@@ -1,42 +1,66 @@
-import AppDataSource from '../app-data-source';
-import { MemberRepository } from '../repositories';
-import { Member } from '../entities';
 import jwt from 'jsonwebtoken';
 
-export const auth = (authorization: string) => {
-  try {
-    const token = authorization && authorization.split(' ')[1];
-    const jwtSecret = 'JsonWebTokenSecret';
-    const accessToken = jwt.verify(token, jwtSecret);
-    authorization;
+export const _AUTH_ = 'rtas"auth';
+export const _REFRESH_ = 'rtas"refresh';
 
-    return accessToken['id'];
+// accessToken 생성
+export const setAccessToken = (id: string) =>
+  jwt.sign({ id }, _AUTH_, {
+    expiresIn: '1d',
+  });
+
+// refreshToken 생성
+export const setRefreshToken = () =>
+  jwt.sign({}, _REFRESH_, {
+    expiresIn: '30 days',
+  });
+
+// accessToken 검증
+// return - 검증 성공 : 아이디, 빈 authToken : -1, 만료 : 0, 잘못된 토큰 : 1
+export const authAccessToken = (authToken: string) => {
+  try {
+    if (authToken) {
+      const token = authToken.split(' ')[1];
+      const accessToken = jwt.verify(token, _AUTH_);
+
+      return accessToken['id'];
+    }
+    return '-1';
   } catch (e) {
-    console.error(e.message);
-    return '';
+    if (e.message === 'jwt expired') {
+      return '0';
+    } else {
+      return '1';
+    }
   }
 };
 
-export const refreshToken = (id: string, refreshToken1: string) => {
+// refreshToken 검증
+// return - 검증 성공 : 0, 빈 refreshToken : -1, 만료 혹은 잘못된 토큰 : 1
+export const authRefreshToken = (refreshToken: string) => {
   try {
-    const token = MemberRepository.getRefreshToken(id, refreshToken1);
-    const jwtSecret = 'JsonWebTokenSecret';
-    const refreshToken = jwt.verify(token, jwtSecret);
-
-    return refreshToken;
+    if (refreshToken) {
+      jwt.verify(refreshToken, _REFRESH_);
+      return 0;
+    }
+    return -1;
   } catch (e) {
-    console.error(e.message);
-    return '';
+    return 1;
   }
 };
 
 export const socketAuth = (token: string) => {
   try {
-    const jwtSecret = 'JsonWebTokenSecret';
-    const userToken = jwt.verify(token, jwtSecret);
-    return userToken['id'];
+    if (token) {
+      const userToken = jwt.verify(token, _AUTH_);
+      return userToken['id'];
+    }
+    return '-1';
   } catch (e) {
-    console.error(e.message);
-    return '';
+    if (e.message === 'jwt expired') {
+      return '0';
+    } else {
+      return '1';
+    }
   }
 };

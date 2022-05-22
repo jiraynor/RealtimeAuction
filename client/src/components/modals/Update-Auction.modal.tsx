@@ -4,10 +4,13 @@ import cookies from 'react-cookies';
 import { Modal } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { setAuction } from '../../actions/auction.action';
+import { getRefreshToken } from '../../reducers/refresh-token.reducer';
 
 const RegistAuctionModal = (props: any) => {
-  const auction = useSelector((state: any) => state.auction);
   const dispatch = useDispatch();
+
+  const auction = useSelector((state: any) => state.auction);
+  const cookie_member = useSelector((state: any) => state.cookie_member);
 
   const [item_name, setItemName] = useState<string>(
     auction.auction_item.item_name
@@ -134,9 +137,9 @@ const RegistAuctionModal = (props: any) => {
         }
       })
       .catch((e) => {
-        if (e.response.status === 422) {
-          setSubmitMessage('등록에 실패했습니다.');
-        }
+        if (e.response.status === 422)
+          setSubmitMessage(getRefreshToken(cookie_member.id) + '');
+        else setSubmitMessage('수정에 실패했습니다.');
       });
   };
 

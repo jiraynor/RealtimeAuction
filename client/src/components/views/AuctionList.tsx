@@ -9,6 +9,7 @@ import { setAuctionList } from '../../actions/auction-list.action';
 import { setAuctionListType } from '../../actions/auction-list-type.action';
 import { setBidLog } from '../../actions/bid-log.action';
 import { setItemImg } from '../../actions/item-img.action';
+import { getRefreshToken } from '../../reducers/refresh-token.reducer';
 
 const AuctionList = () => {
   const dispatch = useDispatch();
@@ -18,6 +19,7 @@ const AuctionList = () => {
     (state: any) => state.auction_list_type
   );
   const socket = useSelector((state: any) => state.auction.socket);
+  const cookie_member = useSelector((state: any) => state.cookie_member);
 
   const [registShow, setRegistShow] = useState<boolean>(false);
   const [pageNum, setPageNum] = useState<number>(1);
@@ -42,18 +44,15 @@ const AuctionList = () => {
           dispatch(setAuction({ auction_item: response.data.auction_item }));
           dispatch(setBidLog({ bid_logs: response.data.bid_logs }));
           dispatch(setItemImg({ item_imgs: response.data.item_imgs }));
-        } else {
-          return;
         }
       });
   };
 
   const registShowHandler = () => {
     const jwt = cookies.load('authToken');
-    if (!jwt) {
-      setAlertMessage('로그인 후 이용하실 수 있습니다.');
-      return;
-    }
+    // TODO: 이부분 수정 해야함
+    setAlertMessage(getRefreshToken(cookie_member.id) + '');
+
     setRegistShow(true);
   };
 
@@ -89,10 +88,6 @@ const AuctionList = () => {
 
   const onMyAuctionsHandler = () => {
     const jwt = cookies.load('authToken');
-    if (!jwt) {
-      setAlertMessage('로그인 후 이용하실 수 있습니다.');
-      return;
-    }
     axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`;
     axios
       .get(`/api/auction/getMyAuctions/${1}`)
@@ -101,18 +96,17 @@ const AuctionList = () => {
           setSearch('');
           dispatch(setAuctionList(response.data));
           dispatch(setAuctionListType({ type: 'my' }));
-        } else {
-          return;
         }
+      })
+      .catch((e) => {
+        if (e.response.status === 422)
+          setAlertMessage(getRefreshToken(cookie_member.id) + '');
+        else setAlertMessage('리스트 불러오기에 실패했습니다.');
       });
   };
 
   const getMyList = (pageNum: number) => {
     const jwt = cookies.load('authToken');
-    if (!jwt) {
-      setAlertMessage('로그인 후 이용하실 수 있습니다.');
-      return;
-    }
     axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`;
     axios
       .get(`/api/auction/getMyAuctions/${pageNum}`)
@@ -122,18 +116,17 @@ const AuctionList = () => {
           setPageNum(pageNum);
           dispatch(setAuctionList(response.data));
           dispatch(setAuctionListType({ type: 'my' }));
-        } else {
-          return;
         }
+      })
+      .catch((e) => {
+        if (e.response.status === 422)
+          setAlertMessage(getRefreshToken(cookie_member.id) + '');
+        else setAlertMessage('리스트 불러오기에 실패했습니다.');
       });
   };
 
   const onBidAuctionsHandler = () => {
     const jwt = cookies.load('authToken');
-    if (!jwt) {
-      setAlertMessage('로그인 후 이용하실 수 있습니다.');
-      return;
-    }
     axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`;
     axios
       .get(`/api/auction/getBidAuctions/${1}`)
@@ -142,18 +135,17 @@ const AuctionList = () => {
           setSearch('');
           dispatch(setAuctionList(response.data));
           dispatch(setAuctionListType({ type: 'bid' }));
-        } else {
-          return;
         }
+      })
+      .catch((e) => {
+        if (e.response.status === 422)
+          setAlertMessage(getRefreshToken(cookie_member.id) + '');
+        else setAlertMessage('리스트 불러오기에 실패했습니다.');
       });
   };
 
   const getBidList = (pageNum: number) => {
     const jwt = cookies.load('authToken');
-    if (!jwt) {
-      setAlertMessage('로그인 후 이용하실 수 있습니다.');
-      return;
-    }
     axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`;
     axios
       .get(`/api/auction/getBidAuctions/${pageNum}`)
@@ -162,9 +154,12 @@ const AuctionList = () => {
           setSearch('');
           dispatch(setAuctionList(response.data));
           dispatch(setAuctionListType({ type: 'bid' }));
-        } else {
-          return;
         }
+      })
+      .catch((e) => {
+        if (e.response.status === 422)
+          setAlertMessage(getRefreshToken(cookie_member.id) + '');
+        else setAlertMessage('리스트 불러오기에 실패했습니다.');
       });
   };
 

@@ -109,11 +109,10 @@ const MemberModal = (props: any) => {
     axios
       .patch(`/api/member/update`, body)
       .then((response: AxiosResponse<any, any>) => {
-        if (response.status === 200) {
-          dispatch(setMember(response.data));
-        } else {
-          setSubmitMessage('수정에 실패했습니다.');
-        }
+        if (response.status === 200) dispatch(setMember(response.data));
+      })
+      .catch((e) => {
+        setSubmitMessage('수정에 실패했습니다.');
       });
   };
 

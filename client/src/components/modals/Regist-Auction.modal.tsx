@@ -2,11 +2,14 @@ import { useState, ChangeEvent, KeyboardEvent, MouseEvent } from 'react';
 import axios, { AxiosResponse } from 'axios';
 import cookies from 'react-cookies';
 import { Modal, Alert } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setAuctionList } from '../../actions/auction-list.action';
+import { getRefreshToken } from '../../reducers/refresh-token.reducer';
 
 const RegistAuctionModal = (props: any) => {
   const dispatch = useDispatch();
+
+  const cookie_member = useSelector((state: any) => state.cookie_member);
 
   const [item_name, setItemName] = useState<string>('');
   const [item_category, setItemCategory] = useState<string>('');
@@ -66,12 +69,6 @@ const RegistAuctionModal = (props: any) => {
       setImageNames(list);
       setImages(fileVal);
     }
-  };
-
-  const removeImage = (index: number) => {
-    const setter = [];
-    for (let i = 0; i < images.length; i++) if (index !== i) setter.push(i);
-    setImages(setter);
   };
 
   const close = () => {
@@ -160,9 +157,9 @@ const RegistAuctionModal = (props: any) => {
         }
       })
       .catch((e) => {
-        if (e.response.status === 422) {
-          setSubmitMessage('등록에 실패했습니다.');
-        }
+        if (e.response.status === 422)
+          setSubmitMessage(getRefreshToken(cookie_member.id) + '');
+        else setSubmitMessage('경매 등록에 실패했습니다.');
       });
   };
 

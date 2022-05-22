@@ -3,7 +3,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 
-import { auth } from '../utils/utility';
+import { authAccessToken } from '../utils/utility';
 import {
   MemberRepository,
   AuctionRepository,
@@ -74,8 +74,13 @@ router.post(
     const dto = req.body;
     const images = req.files;
 
-    const id = auth(req.headers.authorization);
-    if (!id) return res.status(401).send('권한없음');
+    const id = authAccessToken(req.headers.authorization);
+    // 빈 토큰
+    if (id === '-1') return res.status(401).json({});
+    // 기간 만료
+    else if (id === '0') return res.status(401).json({});
+    // 잘못된 토큰
+    else if (id === '1') return res.status(401).json({});
 
     try {
       const {
@@ -92,16 +97,15 @@ router.post(
         lowest_selling_price < 1 ||
         immediate_sale_price < 0
       )
-        return res.status(503).send('0이하의 수 입력 불가');
+        return res.status(503).json({});
 
       if (
         immediate_sale_price > 0 &&
         lowest_selling_price >= immediate_sale_price
       )
-        return res.status(503).send('즉시 매각 금액 수치 오류');
+        return res.status(503).json({});
 
-      if (new Date(deadline) <= new Date())
-        return res.status(503).send('마감일은 하루 이상이어야 합니다.');
+      if (new Date(deadline) <= new Date()) return res.status(503).json({});
 
       const PAGE_NUMBER = 1;
       const member: Member = await MemberRepository.findOneBy({ id });
@@ -121,7 +125,7 @@ router.post(
         .status(200)
         .json({ auction_list, pagination: pagination(count, PAGE_NUMBER) });
     } catch (e) {
-      return res.status(503).send('데이터베이스 오류');
+      return res.status(503).json({});
     }
   }
 );
@@ -142,15 +146,20 @@ router.get('/get/:auction_number', async (req: Request, res: Response) => {
 
     return res.status(200).json({ auction_item, bid_logs, item_imgs });
   } catch (e) {
-    return res.status(503).send('데이터베이스 오류');
+    return res.status(503).json({});
   }
 });
 
 router.patch('/update', async (req: Request, res: Response) => {
   const dto = req.body;
 
-  const id = auth(req.headers.authorization);
-  if (!id) return res.status(401).send('권한없음');
+  const id = authAccessToken(req.headers.authorization);
+  // 빈 토큰
+  if (id === '-1') return res.status(401).json({});
+  // 기간 만료
+  else if (id === '0') return res.status(401).json({});
+  // 잘못된 토큰
+  else if (id === '1') return res.status(401).json({});
 
   try {
     const {
@@ -167,20 +176,19 @@ router.patch('/update', async (req: Request, res: Response) => {
       lowest_selling_price < 1 ||
       immediate_sale_price < 0
     )
-      return res.status(503).send('0이하의 수 입력 불가');
+      return res.status(503).json({});
 
     if (
       immediate_sale_price > 0 &&
       lowest_selling_price >= immediate_sale_price
     )
-      return res.status(503).send('즉시 매각 금액 수치 오류');
+      return res.status(503).json({});
 
-    if (new Date(deadline) <= new Date())
-      return res.status(503).send('마감일은 하루 이상이어야 합니다.');
+    if (new Date(deadline) <= new Date()) return res.status(503).json({});
 
     const auction_num = dto.auction_num;
     const auction = await AuctionRepository.findOneBy({ auction_num });
-    if (auction.saler.id !== id) return res.status(401).send('권한없음');
+    if (auction.saler.id !== id) return res.status(401).json({});
 
     const member: Member = await MemberRepository.findOneBy({ id });
     await AuctionRepository.updateAuction(dto, member);
@@ -190,19 +198,24 @@ router.patch('/update', async (req: Request, res: Response) => {
     return res.status(200).json({ auction_item });
   } catch (e) {
     console.log(e.message);
-    return res.status(503).send('데이터베이스 오류');
+    return res.status(503).json({});
   }
 });
 
 router.patch('/start', async (req: Request, res: Response) => {
   const { auction_num } = req.body;
 
-  const id = auth(req.headers.authorization);
-  if (!id) return res.status(401).send('권한없음');
+  const id = authAccessToken(req.headers.authorization);
+  // 빈 토큰
+  if (id === '-1') return res.status(401).json({});
+  // 기간 만료
+  else if (id === '0') return res.status(401).json({});
+  // 잘못된 토큰
+  else if (id === '1') return res.status(401).json({});
 
   try {
     const auction = await AuctionRepository.findOneBy({ auction_num });
-    if (auction.saler.id !== id) return res.status(401).send('권한없음');
+    if (auction.saler.id !== id) return res.status(401).json({});
 
     await AuctionRepository.startAuction(auction);
     const auction_item = await AuctionRepository.findOneBy({ auction_num });
@@ -210,7 +223,7 @@ router.patch('/start', async (req: Request, res: Response) => {
 
     return res.status(200).json({ auction_item });
   } catch (e) {
-    return res.status(503).send('데이터베이스 오류');
+    return res.status(503).json({});
   }
 });
 
@@ -221,8 +234,15 @@ router.delete('/delete/:auction_num', async (req: Request, res: Response) => {
     auction_num: parseInt(auction_num),
   });
 
-  const id = auth(req.headers.authorization);
-  if (!id || auction.saler.id !== id) return res.status(401).send('권한없음');
+  const id = authAccessToken(req.headers.authorization);
+  // 빈 토큰
+  if (id === '-1') return res.status(401).json({});
+  // 기간 만료
+  else if (id === '0') return res.status(401).json({});
+  // 잘못된 토큰
+  else if (id === '1') return res.status(401).json({});
+  // 권한 없음
+  else if (auction.saler.id !== id) return res.status(401).send('권한없음');
 
   try {
     const PAGE_NUMBER = 1;
@@ -236,14 +256,13 @@ router.delete('/delete/:auction_num', async (req: Request, res: Response) => {
           path.join(path.resolve('server/auction_images'), item_img.img)
         )
       )
-        return res.status(400);
+        return res.status(400).json({});
 
       fs.unlink(
         path.join('server/auction_images', item_img.img),
         function (err) {
           if (err) {
-            console.log('Error : ', err);
-            return res.status(400);
+            return res.status(400).json({});
           }
         }
       );
@@ -261,7 +280,7 @@ router.delete('/delete/:auction_num', async (req: Request, res: Response) => {
       .status(200)
       .json({ auction_list, pagination: pagination(count, PAGE_NUMBER) });
   } catch (e) {
-    return res.status(503).send('데이터베이스 오류');
+    return res.status(503).json({});
   }
 });
 
@@ -277,7 +296,7 @@ router.get('/getAuctions/:page', async (req: Request, res: Response) => {
       .status(200)
       .json({ auction_list, pagination: pagination(count, parseInt(page)) });
   } catch (e) {
-    return res.status(503).send('데이터베이스 오류');
+    return res.status(503).json({});
   }
 });
 
@@ -298,7 +317,7 @@ router.get(
         .status(200)
         .json({ auction_list, pagination: pagination(count, parseInt(page)) });
     } catch (e) {
-      return res.status(503).send('데이터베이스 오류');
+      return res.status(503).json({});
     }
   }
 );
@@ -306,8 +325,13 @@ router.get(
 router.get('/getBidAuctions/:page', async (req: Request, res: Response) => {
   const { page } = req.params;
 
-  const id = auth(req.headers.authorization);
-  if (!id) return res.status(401).send('권한없음');
+  const id = authAccessToken(req.headers.authorization);
+  // 빈 토큰
+  if (id === '-1') return res.status(401).json({});
+  // 기간 만료
+  else if (id === '0') return res.status(401).json({});
+  // 잘못된 토큰
+  else if (id === '1') return res.status(401).json({});
 
   try {
     const saler: Member = await MemberRepository.findOneBy({ id });
@@ -322,15 +346,20 @@ router.get('/getBidAuctions/:page', async (req: Request, res: Response) => {
       .status(200)
       .json({ auction_list, pagination: pagination(count, parseInt(page)) });
   } catch (e) {
-    return res.status(503).send('데이터베이스 오류');
+    return res.status(503).json({});
   }
 });
 
 router.get('/getMyAuctions/:page', async (req: Request, res: Response) => {
   const { page } = req.params;
 
-  const id = auth(req.headers.authorization);
-  if (!id) return res.status(401).send('권한없음');
+  const id = authAccessToken(req.headers.authorization);
+  // 빈 토큰
+  if (id === '-1') return res.status(401).json({});
+  // 기간 만료
+  else if (id === '0') return res.status(401).json({});
+  // 잘못된 토큰
+  else if (id === '1') return res.status(401).json({});
 
   try {
     const saler = await MemberRepository.findOneBy({ id });
@@ -345,7 +374,7 @@ router.get('/getMyAuctions/:page', async (req: Request, res: Response) => {
       .status(200)
       .json({ auction_list, pagination: pagination(count, parseInt(page)) });
   } catch (e) {
-    return res.status(503).send('데이터베이스 오류');
+    return res.status(503).json({});
   }
 });
 

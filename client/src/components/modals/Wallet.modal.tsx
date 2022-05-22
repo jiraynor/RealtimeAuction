@@ -4,6 +4,7 @@ import axios, { AxiosResponse } from 'axios';
 import cookies from 'react-cookies';
 import { useSelector, useDispatch } from 'react-redux';
 import { setBalance } from '../../actions/balance.action';
+import { getRefreshToken } from '../../reducers/refresh-token.reducer';
 
 const WalletModal = (props: any) => {
   const dispatch = useDispatch();
@@ -24,21 +25,21 @@ const WalletModal = (props: any) => {
       setTransactionMessage('음수 값은 입금 하실수 없습니다.');
       return;
     }
-    const body = {
-      amount,
-    };
+
     const jwt = cookies.load('authToken');
     axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`;
     axios
-      .post(`/api/member/deposit`, body)
+      .post(`/api/member/deposit`, { amount })
       .then((response: AxiosResponse<any, any>) => {
         if (response.status === 200) {
           const { balance } = response.data;
           dispatch(setBalance({ balance }));
-        } else {
-          setTransactionMessage('입금에 실패했습니다.');
-          return;
         }
+      })
+      .catch((e) => {
+        if (e.response.status === 422)
+          setTransactionMessage(getRefreshToken(cookie_member.id) + '');
+        else setTransactionMessage('입금에 실패했습니다.');
       });
   };
 
@@ -51,21 +52,21 @@ const WalletModal = (props: any) => {
       setTransactionMessage('소유한 금액보다 큰 금액은 출금 하실수 없습니다.');
       return;
     }
-    const body = {
-      amount,
-    };
+
     const jwt = cookies.load('authToken');
     axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`;
     axios
-      .post(`/api/member/withdrawal`, body)
+      .post(`/api/member/withdrawal`, { amount })
       .then((response: AxiosResponse<any, any>) => {
         if (response.status === 200) {
           const { balance } = response.data;
           dispatch(setBalance({ balance }));
-        } else {
-          setTransactionMessage('출금에 실패했습니다.');
-          return;
         }
+      })
+      .catch((e) => {
+        if (e.response.status === 422)
+          setTransactionMessage(getRefreshToken(cookie_member.id) + '');
+        else setTransactionMessage('출금에 실패했습니다.');
       });
   };
 
