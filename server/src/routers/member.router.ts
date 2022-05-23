@@ -129,6 +129,8 @@ router.get('/get', async (req: Request, res: Response) => {
     const member: Member = await MemberRepository.findOneBy({ id });
 
     member.password = '********';
+    member.refreshToken = '********';
+
     return res.status(200).json(member);
   } catch (e) {
     // 데이터베이스 오류
@@ -154,6 +156,10 @@ router.patch('/update', async (req: Request, res: Response) => {
 
   try {
     const member: Member = await MemberRepository.updateMember(dto);
+
+    if (member.id !== id)
+      return res.status(403).json({ state: false, message: 'No Permissions.' });
+
     return res.status(200).json(member);
   } catch (e) {
     // 데이터베이스 오류
