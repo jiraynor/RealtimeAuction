@@ -6,6 +6,8 @@ import {
   authAccessToken,
   setAccessToken,
   setRefreshToken,
+  accessExp,
+  refreshExp,
 } from '../utils/utility';
 import { MemberRepository } from '../repositories';
 import { Member } from '../entities';
@@ -85,15 +87,26 @@ router.post(
       MemberRepository.setRefreshToken(member, refreshToken);
 
       return res.status(200).json({
+        // 결과 상태
         state: true,
+        // authToken
         authToken: accessToken,
+        // authToken 만료기간
+        authExp: accessExp,
+        // refreshToken
         refreshToken,
+        // refreshToken 만료기간
+        refreshExp,
+        // 회원 아이디
         id: member.id,
+        // 회원 이름
         name: member.name,
+        // 회원 잔액
         balance: member.balance,
       });
     } catch (e) {
-      return res.status(503).json({ state: false, message: 'Database Error.' });
+      // 데이터베이스 오류
+      return res.status(503).json({ state: false, message: 'Database Error' });
     }
   }
 );
@@ -103,11 +116,14 @@ router.get('/get', async (req: Request, res: Response) => {
   const id = authAccessToken(req.headers.authorization);
 
   // 빈 토큰
-  if (id === '-1') return res.status(401).json({});
+  if (id === '-1')
+    return res.status(496).json({ state: false, message: 'Empty Token.' });
   // 기간 만료
-  else if (id === '0') return res.status(401).json({});
+  else if (id === '0')
+    return res.status(402).json({ state: false, message: 'Expired Token.' });
   // 잘못된 토큰
-  else if (id === '1') return res.status(401).json({});
+  else if (id === '1')
+    return res.status(495).json({ state: false, message: 'Invalid Token.' });
 
   try {
     const member: Member = await MemberRepository.findOneBy({ id });
@@ -115,7 +131,8 @@ router.get('/get', async (req: Request, res: Response) => {
     member.password = '********';
     return res.status(200).json(member);
   } catch (e) {
-    return res.status(503).send('Database Error.');
+    // 데이터베이스 오류
+    return res.status(503).json({ state: false, message: 'Database Error' });
   }
 });
 
@@ -126,17 +143,21 @@ router.patch('/update', async (req: Request, res: Response) => {
   const id = authAccessToken(req.headers.authorization);
 
   // 빈 토큰
-  if (id === '-1') return res.status(401).json({});
+  if (id === '-1')
+    return res.status(496).json({ state: false, message: 'Empty Token.' });
   // 기간 만료
-  else if (id === '0') return res.status(401).json({});
+  else if (id === '0')
+    return res.status(402).json({ state: false, message: 'Expired Token.' });
   // 잘못된 토큰
-  else if (id === '1') return res.status(401).json({});
+  else if (id === '1')
+    return res.status(495).json({ state: false, message: 'Invalid Token.' });
 
   try {
     const member: Member = await MemberRepository.updateMember(dto);
     return res.status(200).json(member);
   } catch (e) {
-    return res.status(503).send('데이터베이스 오류');
+    // 데이터베이스 오류
+    return res.status(503).json({ state: false, message: 'Database Error' });
   }
 });
 
@@ -144,27 +165,35 @@ router.patch('/update', async (req: Request, res: Response) => {
 router.post('/withdrawal', async (req: Request, res: Response) => {
   const { amount } = req.body;
 
-  if (amount < 0) return res.status(401).json({});
+  if (amount < 0)
+    return res.status(400).json({ state: false, message: 'Invalid request.' });
 
   const id = authAccessToken(req.headers.authorization);
   // 빈 토큰
-  if (id === '-1') return res.status(401).json({});
+  if (id === '-1')
+    return res.status(496).json({ state: false, message: 'Empty Token.' });
   // 기간 만료
-  else if (id === '0') return res.status(401).json({});
+  else if (id === '0')
+    return res.status(402).json({ state: false, message: 'Expired Token.' });
   // 잘못된 토큰
-  else if (id === '1') return res.status(401).json({});
+  else if (id === '1')
+    return res.status(495).json({ state: false, message: 'Invalid Token.' });
 
   try {
     const member: Member = await MemberRepository.findOneBy({ id });
 
-    if (member.balance < amount) return res.status(412).json({});
+    if (member.balance < amount)
+      return res
+        .status(400)
+        .json({ state: false, message: 'A Shortage of Balance.' });
 
     member.balance -= amount;
     await MemberRepository.save(member);
 
     return res.status(200).json({ balance: member.balance });
   } catch (e) {
-    return res.status(503).json({});
+    // 데이터베이스 오류
+    return res.status(503).json({ state: false, message: 'Database Error' });
   }
 });
 
@@ -176,11 +205,14 @@ router.post('/deposit', async (req: Request, res: Response) => {
 
   const id = authAccessToken(req.headers.authorization);
   // 빈 토큰
-  if (id === '-1') return res.status(401).json({});
+  if (id === '-1')
+    return res.status(496).json({ state: false, message: 'Empty Token.' });
   // 기간 만료
-  else if (id === '0') return res.status(401).json({});
+  else if (id === '0')
+    return res.status(402).json({ state: false, message: 'Expired Token.' });
   // 잘못된 토큰
-  else if (id === '1') return res.status(401).json({});
+  else if (id === '1')
+    return res.status(495).json({ state: false, message: 'Invalid Token.' });
 
   try {
     const member: Member = await MemberRepository.findOneBy({ id });
@@ -190,7 +222,8 @@ router.post('/deposit', async (req: Request, res: Response) => {
 
     return res.status(200).json({ balance: member.balance });
   } catch (e) {
-    return res.status(503).json({});
+    // 데이터베이스 오류
+    return res.status(503).json({ state: false, message: 'Database Error' });
   }
 });
 
@@ -198,18 +231,22 @@ router.post('/deposit', async (req: Request, res: Response) => {
 router.post('/getBalance', async (req: Request, res: Response) => {
   const id = authAccessToken(req.headers.authorization);
   // 빈 토큰
-  if (id === '-1') return res.status(401).json({});
+  if (id === '-1')
+    return res.status(496).json({ state: false, message: 'Empty Token.' });
   // 기간 만료
-  else if (id === '0') return res.status(401).json({});
+  else if (id === '0')
+    return res.status(402).json({ state: false, message: 'Expired Token.' });
   // 잘못된 토큰
-  else if (id === '1') return res.status(401).json({});
+  else if (id === '1')
+    return res.status(495).json({ state: false, message: 'Invalid Token.' });
 
   try {
     const member: Member = await MemberRepository.findOneBy({ id });
 
     return res.status(200).json({ balance: member.balance });
   } catch (e) {
-    return res.status(503).json({});
+    // 데이터베이스 오류
+    return res.status(503).json({ state: false, message: 'Database Error' });
   }
 });
 

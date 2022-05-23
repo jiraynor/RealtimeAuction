@@ -1,4 +1,6 @@
 import jwt from 'jsonwebtoken';
+export const accessExp = 1000 * 60 * 60;
+export const refreshExp = 1000 * 60 * 60 * 24 * 15;
 
 export const _AUTH_ = 'rtas"auth';
 export const _REFRESH_ = 'rtas"refresh';
