@@ -172,7 +172,7 @@ router.post('/withdrawal', async (req: Request, res: Response) => {
   const { amount } = req.body;
 
   if (amount < 0)
-    return res.status(400).json({ state: false, message: 'Invalid request.' });
+    return res.status(406).json({ state: false, message: 'Invalid Amount.' });
 
   const id = authAccessToken(req.headers.authorization);
   // 빈 토큰
@@ -207,7 +207,8 @@ router.post('/withdrawal', async (req: Request, res: Response) => {
 router.post('/deposit', async (req: Request, res: Response) => {
   const { amount } = req.body;
 
-  if (amount < 0) return res.status(401).json({});
+  if (amount < 0)
+    return res.status(406).json({ state: false, message: 'Invalid Amount.' });
 
   const id = authAccessToken(req.headers.authorization);
   // 빈 토큰
