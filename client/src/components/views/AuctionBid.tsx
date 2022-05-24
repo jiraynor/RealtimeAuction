@@ -1,5 +1,6 @@
-import React, { useState, ChangeEvent, useEffect } from 'react';
+import { useState, ChangeEvent } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+
 import { setBidLog } from '../../actions/bid-log.action';
 import { setAuction } from '../../actions/auction.action';
 
@@ -80,9 +81,7 @@ const AuctionBid = () => {
       {alertMessage !== '' && (
         <div className="toast show ml-1">
           <div className="toast-header">
-            <strong className="mr-auto text-danger">
-              본인경매에는 입찰할 수 없습니다.
-            </strong>
+            <strong className="mr-auto text-danger">{alertMessage}</strong>
           </div>
         </div>
       )}

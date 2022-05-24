@@ -34,11 +34,15 @@ export async function setBid(
       auction.current_price >= bid_price ||
       auction.lowest_selling_price > bid_price
     )
-      return { status: 400, message: '금액 오류', value: [] };
+      return { status: 400, message: '금액 오류입니다.', value: [] };
 
     // 본인상품 막기
     if (id === auction.saler.id)
-      return { status: 400, message: '본인 물건', value: [] };
+      return {
+        status: 400,
+        message: '본인 물건에는 입찰하실수 없습니다.',
+        value: [],
+      };
 
     // bid_log 넣기
     await BidRepository.set(auction, bider, bid_price);
@@ -54,7 +58,7 @@ export async function setBid(
 
     return { status: 200, message: '성공', bid_logs, auction_item };
   } catch (e) {
-    return { status: 400, message: '데이터베이스 오류', value: [] };
+    return { status: 400, message: '데이터베이스 오류입니다.', value: [] };
   }
 }
 

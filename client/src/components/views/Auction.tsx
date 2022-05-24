@@ -1,5 +1,5 @@
-import React from 'react';
 import { useSelector } from 'react-redux';
+
 import AuctionBid from './AuctionBid';
 import AuctionItem from './AuctionItem';
 

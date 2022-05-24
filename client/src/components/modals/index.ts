@@ -4,6 +4,7 @@ import SignInModal from './SignIn.modal';
 import SignUpModal from './SignUp.modal';
 import WalletModal from './Wallet.modal';
 import UpdateAuctionModal from './Update-Auction.modal';
+import ItemImageModal from './Item-Image.modal';
 
 export {
   MemberModal,
@@ -12,4 +13,5 @@ export {
   SignInModal,
   SignUpModal,
   WalletModal,
+  ItemImageModal,
 };

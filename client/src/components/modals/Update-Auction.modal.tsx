@@ -1,8 +1,10 @@
 import { useState, useEffect, ChangeEvent } from 'react';
-import axios, { AxiosResponse } from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
 import cookies from 'react-cookies';
 import { Modal } from 'react-bootstrap';
-import { useDispatch, useSelector } from 'react-redux';
+
+import axios, { AxiosResponse } from 'axios';
+
 import { setAuction } from '../../actions/auction.action';
 import { getRefreshToken } from '../../reducers/refresh-token.reducer';
 

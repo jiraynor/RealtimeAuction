@@ -96,10 +96,10 @@ router.post(
 
       // 잘못된 입력
       if (
-        number_of_item < 1 ||
-        appraisal_value < 1 ||
-        lowest_selling_price < 1 ||
-        immediate_sale_price < 0
+        parseInt(number_of_item) < 1 ||
+        parseInt(appraisal_value) < 1 ||
+        parseInt(lowest_selling_price) < 1 ||
+        parseInt(immediate_sale_price) < 0
       )
         return res
           .status(406)
@@ -107,8 +107,8 @@ router.post(
 
       // 잘못된 금액
       if (
-        immediate_sale_price > 0 &&
-        lowest_selling_price >= immediate_sale_price
+        parseInt(immediate_sale_price) > 0 &&
+        parseInt(lowest_selling_price) >= parseInt(immediate_sale_price)
       )
         return res
           .status(406)
@@ -151,6 +151,8 @@ router.get('/get/:auction_number', async (req: Request, res: Response) => {
     const auction_item: Auction_item = await AuctionRepository.findOneBy({
       auction_num,
     });
+
+    console.log(typeof auction_item.deadline);
 
     const item_imgs = await ItemImgRepository.getImgs(auction_item);
 

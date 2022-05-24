@@ -27,7 +27,7 @@ export const AuctionRepository = AppDataSource.getRepository(
       lowest_selling_price,
       immediate_sale_price,
       item_note,
-      deadline,
+      deadline: deadline + ' 09:00:00',
       saler: member,
     });
 
@@ -123,7 +123,7 @@ export const AuctionRepository = AppDataSource.getRepository(
       lowest_selling_price,
       immediate_sale_price,
       item_note,
-      deadline,
+      deadline: deadline + ' 09:00:00',
       saler,
     });
 

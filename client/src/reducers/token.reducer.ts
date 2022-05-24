@@ -1,12 +1,13 @@
-import { SET_AUCTION_LIST_TYPE } from '../actions/auction-list-type.action';
+import { SET_TOKEN } from '../actions/token.action';
+
 const initState = {
-  value: { type: 'all' },
+  value: { authToken: '', refreshToken: '' },
 };
 
 export default function reducer(state = initState, action: any) {
   const { type, value } = action;
   switch (type) {
-    case SET_AUCTION_LIST_TYPE: {
+    case SET_TOKEN: {
       return {
         ...state,
         ...value,

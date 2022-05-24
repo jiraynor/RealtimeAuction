@@ -1,8 +1,13 @@
 import React, { useState, MouseEvent, ChangeEvent, KeyboardEvent } from 'react';
 import { Button, Modal, Form, Row, Col, Alert } from 'react-bootstrap';
+
 import axios, { AxiosResponse } from 'axios';
+import { useIdCheck, useSignUp } from '../../hooks';
 
 const SignUpModal = (props: any) => {
+  const { signUpMessage, signUpMessageReset, signUp } = useSignUp();
+  const { idCheck, idCheckMessage, idCheckingReset, idChecking } = useIdCheck();
+
   const [id, setId] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [password2, setPassword2] = useState<string>('');
@@ -13,15 +18,12 @@ const SignUpModal = (props: any) => {
   const [account_num, setAccount_num] = useState<string>('');
   const [bank_code, setBank_code] = useState<string>('');
 
-  const [idCheck, setIdCheck] = useState<boolean>(false);
   const [passwordCheck, setPasswordCheck] = useState<boolean>(false);
   const [password2Check, setPassword2Check] = useState<boolean>(false);
   const [telCheck, setTelCheck] = useState<boolean>(false);
 
-  const [idMessage, setIdMessage] = useState<string>('');
   const [passwordMessage, setPasswordMessage] = useState<string>('');
   const [telMessage, setTelMessage] = useState<string>('');
-  const [submitMessage, setSubmitMessage] = useState<string>('');
 
   const onIdHandler = (e: ChangeEvent<HTMLInputElement>): void =>
     setId(e.target.value);
@@ -42,27 +44,7 @@ const SignUpModal = (props: any) => {
   const onBank_codeHandler = (e: ChangeEvent<HTMLSelectElement>): void =>
     setBank_code(e.target.value);
 
-  const onCheckIdHandler = (e: MouseEvent<HTMLButtonElement>) => {
-    if (id.length === 0) {
-      setIdMessage('아이디를 입력하세요.');
-      return;
-    }
-    axios
-      .get(`/api/member/checkId/${id}`)
-      .then((response: AxiosResponse<any, any>) => {
-        if (response.status === 200) {
-          setIdCheck(true);
-          setIdMessage('사용 가능한 아이디입니다.');
-        }
-      })
-      .catch((e) => {
-        if (e.response.status === 406) {
-          setIdCheck(false);
-          setIdMessage('사용 중인 아이디입니다.');
-        }
-      });
-  };
-
+  const onCheckIdHandler = () => idChecking(id);
   const onCheckPasswordPattern = (e: KeyboardEvent<HTMLInputElement>) => {
     if (password.length < 8 || password.length > 20) {
       setPasswordMessage('비밀번호는 8자 이상 20자 이하이어야 합니다.');
@@ -138,14 +120,13 @@ const SignUpModal = (props: any) => {
     setEmail('');
     setAccount_num('');
     setBank_code('');
-    setIdCheck(false);
     setPasswordCheck(false);
     setPassword2Check(false);
     setTelCheck(false);
-    setIdMessage('');
     setPasswordMessage('');
     setTelMessage('');
-    setSubmitMessage('');
+    idCheckingReset();
+    signUpMessageReset();
   };
 
   const close = () => {
@@ -157,64 +138,21 @@ const SignUpModal = (props: any) => {
     // 기본 이벤트 제거
     e.preventDefault();
 
-    if (
-      id.length === 0 ||
-      password.length === 0 ||
-      password2.length === 0 ||
-      name.length === 0 ||
-      tel.length === 0 ||
-      address.length === 0 ||
-      email.length === 0 ||
-      account_num.length === 0 ||
-      bank_code.length === 0
-    ) {
-      setSubmitMessage('모든 값을 입력해주세요.');
-      return;
-    }
-
-    if (!idCheck) {
-      setSubmitMessage('아이디 중복체크를 해주세요.');
-      return;
-    }
-
-    if (!passwordCheck) {
-      setSubmitMessage('비밀번호 조건이 충족되지 않았습니다.');
-      return;
-    }
-
-    if (!password2Check) {
-      setSubmitMessage('비밀번호가 서로 다릅니다.');
-      return;
-    }
-
-    if (!telCheck) {
-      setSubmitMessage('올바른 전화번호를 입력하세요.');
-      return;
-    }
-
     const body = {
       id,
       password,
+      password2,
       name,
-      address,
       tel,
+      address,
       email,
       account_num,
       bank_code,
     };
 
-    axios
-      .post(`/api/member/signUp`, body)
-      .then((response: AxiosResponse<any, any>) => {
-        if (response.status === 200) {
-          close();
-        }
-      })
-      .catch((e) => {
-        if (e.response.status === 422) {
-          setSubmitMessage('회원가입에 실패했습니다.');
-        }
-      });
+    const checked = { idCheck, passwordCheck, password2Check, telCheck };
+
+    signUp(body, checked, close);
   };
 
   return (
@@ -243,9 +181,9 @@ const SignUpModal = (props: any) => {
             </button>
           </Col>
         </Row>
-        {idMessage && (
+        {idCheckMessage && (
           <Alert className="mb-2" variant={'success'}>
-            {idMessage}
+            {idCheckMessage}
           </Alert>
         )}
         <Row className="mb-2">
@@ -324,9 +262,9 @@ const SignUpModal = (props: any) => {
             </select>
           </Col>
         </Row>
-        {submitMessage && (
+        {signUpMessage && (
           <Alert className="mb-2" variant={'danger'}>
-            {submitMessage}
+            {signUpMessage}
           </Alert>
         )}
       </Modal.Body>

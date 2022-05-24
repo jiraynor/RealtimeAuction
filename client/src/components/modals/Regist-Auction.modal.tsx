@@ -1,8 +1,10 @@
-import { useState, ChangeEvent, KeyboardEvent, MouseEvent } from 'react';
-import axios, { AxiosResponse } from 'axios';
+import { useState, ChangeEvent } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import cookies from 'react-cookies';
 import { Modal, Alert } from 'react-bootstrap';
-import { useDispatch, useSelector } from 'react-redux';
+
+import axios, { AxiosResponse } from 'axios';
+
 import { setAuctionList } from '../../actions/auction-list.action';
 import { getRefreshToken } from '../../reducers/refresh-token.reducer';
 
@@ -63,8 +65,6 @@ const RegistAuctionModal = (props: any) => {
       for (let i = 0; i < fileVal.length; i++) {
         list.push(fileVal[i].name);
       }
-
-      console.log(list);
 
       setImageNames(list);
       setImages(fileVal);
@@ -137,8 +137,9 @@ const RegistAuctionModal = (props: any) => {
     formData.append('deadline', deadline);
     formData.append('pageType', 'all');
 
-    for (let i = 0; i < images.length; i++)
-      formData.append('images', images[i]);
+    if (images)
+      for (let i = 0; i < images.length; i++)
+        formData.append('images', images[i]);
 
     const config = {
       headers: {

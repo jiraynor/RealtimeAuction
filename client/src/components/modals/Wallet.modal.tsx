@@ -1,8 +1,10 @@
 import { useState, ChangeEvent } from 'react';
-import { Button, Modal, Form, Row, Col, Alert } from 'react-bootstrap';
-import axios, { AxiosResponse } from 'axios';
-import cookies from 'react-cookies';
 import { useSelector, useDispatch } from 'react-redux';
+import cookies from 'react-cookies';
+import { Button, Modal, Form, Row, Col, Alert } from 'react-bootstrap';
+
+import axios, { AxiosResponse } from 'axios';
+
 import { setBalance } from '../../actions/balance.action';
 import { getRefreshToken } from '../../reducers/refresh-token.reducer';
 

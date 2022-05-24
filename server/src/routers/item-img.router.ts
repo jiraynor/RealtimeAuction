@@ -11,7 +11,7 @@ router.get('/:filename', async (req: Request, res: Response) => {
   if (
     !fs.existsSync(path.join(path.resolve('server/auction_images'), filename))
   )
-    return res.status(400).json({ state: false, message: 'Not Existed File' });
+    return res.status(400).json({ state: false, message: 'Not Existed File.' });
 
   return res.sendFile(
     path.join(path.resolve('server/auction_images'), filename)

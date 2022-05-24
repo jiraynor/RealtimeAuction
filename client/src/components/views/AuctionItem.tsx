@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import axios, { AxiosResponse } from 'axios';
 import cookies from 'react-cookies';
-import { UpdateAuctionModal } from '../modals';
-import { removeAuction, setAuction } from '../../actions/auction.action';
+
+import axios, { AxiosResponse } from 'axios';
+
+import { UpdateAuctionModal, ItemImageModal } from '../modals';
+
+import { setAuction } from '../../actions/auction.action';
 import { setAuctionList } from '../../actions/auction-list.action';
 import { setAuctionListType } from '../../actions/auction-list-type.action';
-import ImageModal from '../modals/Item-Image.modal';
 import { getRefreshToken } from '../../reducers/refresh-token.reducer';
 
 const AuctionItem = () => {
@@ -153,7 +155,7 @@ const AuctionItem = () => {
                       이미지 보기
                     </button>
                   </div>
-                  <ImageModal show={imageShow} onHide={imageCloseHandler} />
+                  <ItemImageModal show={imageShow} onHide={imageCloseHandler} />
                 </>
               )}
             </div>

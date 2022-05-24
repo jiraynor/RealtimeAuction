@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Modal, Carousel } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
+import { Modal, Carousel } from 'react-bootstrap';
 
 const ImageModal = (props: any) => {
   const auction = useSelector((state: any) => state.auction.auction_item);

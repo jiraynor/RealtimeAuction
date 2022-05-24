@@ -1,9 +1,10 @@
-import React, { useEffect, useState, ChangeEvent } from 'react';
+import { useEffect, useState, ChangeEvent } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import cookies from 'react-cookies';
 
-import { RegistAuctionModal } from '../modals';
 import axios, { AxiosResponse } from 'axios';
+
+import { RegistAuctionModal } from '../modals';
 import { setAuction } from '../../actions/auction.action';
 import { setAuctionList } from '../../actions/auction-list.action';
 import { setAuctionListType } from '../../actions/auction-list-type.action';
@@ -49,9 +50,9 @@ const AuctionList = () => {
   };
 
   const registShowHandler = () => {
-    const jwt = cookies.load('authToken');
-    // TODO: 이부분 수정 해야함
-    setAlertMessage(getRefreshToken(cookie_member.id) + '');
+    // const jwt = cookies.load('authToken');
+    // // TODO: 이부분 수정 해야함
+    // setAlertMessage(getRefreshToken(cookie_member.id) + '');
 
     setRegistShow(true);
   };

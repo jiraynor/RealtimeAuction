@@ -1,14 +1,14 @@
 import { useEffect, useState, MouseEvent } from 'react';
-import SignUpModal from '../modals/SignUp.modal';
-import SignInModal from '../modals/SignIn.modal';
-import WalletModal from '../modals/Wallet.modal';
-import MemberModal from '../modals/Member.modal';
 import { useSelector, useDispatch } from 'react-redux';
 import cookies from 'react-cookies';
+
 import axios, { AxiosResponse } from 'axios';
-import { setMember } from '../../actions/member.action';
+
+import { SignUpModal, SignInModal, WalletModal, MemberModal } from '../modals';
+
 import { setCookieMember } from '../../actions/cookie-member.action';
 import { setBalance } from '../../actions/balance.action';
+import { useGetBalance, useGetMember } from '../../hooks';
 
 function Nav() {
   const dispatch = useDispatch();
@@ -17,10 +17,12 @@ function Nav() {
   const balance = useSelector((state: any) => state.balance);
   const socket = useSelector((state: any) => state.auction.socket);
 
+  const { memberShow, memberShowReset, getMember } = useGetMember();
+  const { getBalance } = useGetBalance();
+
   const [signUpShow, setSignUpShow] = useState<boolean>(false);
   const [signInShow, setSignInShow] = useState<boolean>(false);
   const [walletShow, setWalletShow] = useState<boolean>(false);
-  const [memberShow, setMemberShow] = useState<boolean>(false);
 
   const signUpCloseHandler = () => setSignUpShow(false);
   const signUpShowHandler = () => setSignUpShow(true);
@@ -28,27 +30,13 @@ function Nav() {
   const signInShowHandler = () => setSignInShow(true);
   const walletCloseHandler = () => setWalletShow(false);
   const walletShowHandler = () => setWalletShow(true);
-  const memberCloseHandler = () => setMemberShow(false);
+  const memberCloseHandler = () => memberShowReset();
 
-  const memberShowHandler = () => {
-    const jwt = cookies.load('authToken');
-    axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`;
-    axios.get(`/api/member/get`).then((response: AxiosResponse<any, any>) => {
-      if (response.status === 200) {
-        dispatch(setMember(response.data));
-        setMemberShow(true);
-      } else {
-        return;
-      }
-    });
-  };
+  const memberShowHandler = () => getMember();
 
   const signOutHandler = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    if (socket) {
-      socket.disconnect();
-      console.log('disconnect');
-    }
+    if (socket) socket.disconnect();
     dispatch(setCookieMember({ id: '', name: '' }));
     dispatch(setBalance({ balance: 0 }));
     cookies.save('authToken', '', {
@@ -58,29 +46,8 @@ function Nav() {
       expires: new Date(),
     });
   };
-
   useEffect(() => {
-    const cookie_member = cookies.load('member');
-
-    if (cookie_member) {
-      dispatch(setCookieMember(cookie_member));
-      const { id } = cookie_member;
-
-      const body = {
-        id,
-      };
-
-      const jwt = cookies.load('authToken');
-      axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`;
-      axios
-        .post(`/api/member/getBalance`, body)
-        .then((response: AxiosResponse<any, any>) => {
-          if (response.status === 200) {
-            const { balance } = response.data;
-            dispatch(setBalance({ balance }));
-          }
-        });
-    }
+    getBalance();
   }, []);
 
   return (

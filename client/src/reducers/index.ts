@@ -7,6 +7,7 @@ import auction from './auction.reducer';
 import auction_list from './auction-list.reducer';
 import auction_list_type from './auction-list-type.reducer';
 import item_img from './item-img.action';
+import token from './token.reducer';
 
 export default combineReducers({
   member,
@@ -17,4 +18,5 @@ export default combineReducers({
   auction_list,
   auction_list_type,
   item_img,
+  token,
 });

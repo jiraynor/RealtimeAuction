@@ -1,21 +1,13 @@
-import { useState, MouseEvent, ChangeEvent } from 'react';
+import { useState, MouseEvent, ChangeEvent, useEffect } from 'react';
 import { Button, Modal, Form, Row, Col, Alert } from 'react-bootstrap';
-import { useDispatch, useSelector } from 'react-redux';
-import axios, { AxiosResponse } from 'axios';
-import cookies from 'react-cookies';
-import { setCookieMember } from '../../actions/cookie-member.action';
-import { setBalance } from '../../actions/balance.action';
-import { setSocket } from '../../actions/auction.action';
+
+import { useSignIn } from '../../hooks';
 
 const SignInModal = (props: any) => {
-  const dispatch = useDispatch();
-  const socket = useSelector((state: any) => state.auction.socket);
-  const auction = useSelector((state: any) => state.auction.auction_item);
+  const { signInMessage, signInMessageReset, signIn } = useSignIn();
 
   const [id, setId] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-
-  const [submitMessage, setSubmitMessage] = useState<string>('');
 
   const onIdHandler = (e: ChangeEvent<HTMLInputElement>): void =>
     setId(e.target.value);
@@ -25,7 +17,7 @@ const SignInModal = (props: any) => {
   const reset = () => {
     setId('');
     setPassword('');
-    setSubmitMessage('');
+    signInMessageReset();
   };
 
   const close = () => {
@@ -35,56 +27,7 @@ const SignInModal = (props: any) => {
 
   const onSubmitHandler = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-
-    if (id.length === 0 || password.length === 0) {
-      setSubmitMessage('모든 값을 입력해주세요.');
-      return;
-    }
-
-    const body = {
-      id,
-      password,
-    };
-
-    axios
-      .post(`/api/member/signIn`, body)
-      .then((response: AxiosResponse<any, any>) => {
-        if (response.status === 200) {
-          const { authToken, id, name, balance, refreshToke } = response.data;
-          const member = { id, name };
-          if (socket) socket.disconnect();
-
-          dispatch(setCookieMember(member));
-          dispatch(setBalance({ balance: parseInt(balance) }));
-
-          const expires = new Date();
-          expires.setMinutes(expires.getMinutes() + 1);
-          cookies.save('authToken', authToken, {
-            path: '/',
-            secure: true,
-            expires,
-          });
-
-          cookies.save('member', member, {
-            path: '/',
-            expires,
-          });
-
-          cookies.save('refreshToke', refreshToke, {
-            path: '/',
-            expires,
-          });
-
-          if (auction) dispatch(setSocket(auction.auction_num));
-
-          close();
-        }
-      })
-      .catch((e) => {
-        if (e.response.status === 406) {
-          setSubmitMessage('로그인 정보가 일치하지 않습니다.');
-        }
-      });
+    signIn(id, password, close);
   };
 
   return (
@@ -116,9 +59,9 @@ const SignInModal = (props: any) => {
             />
           </Col>
         </Row>
-        {submitMessage && (
+        {signInMessage && (
           <Alert className="mb-2" variant={'danger'}>
-            {submitMessage}
+            {signInMessage}
           </Alert>
         )}
       </Modal.Body>
